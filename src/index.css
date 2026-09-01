@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-primary: #84CC16;
+    --color-primary-accent: #22C55E;
+    --color-surface: #0B110D;
+    --color-surface-card: #111A13;
+    --color-surface-muted: #16241A;
+    --color-border: #1E2E21;
+    --color-border-dark: #2A402E;
+    --color-text-main: #F1F5F2;
+    --color-text-muted: #9CAFA0;
+  }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #0B110D;
+  color: #F1F5F2;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, .font-display {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  display: inline-block;
+  user-select: none;
+}
+
+.material-symbols-outlined.fill,
+.material-symbols-outlined.fill-icon {
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Hide scrollbars for clean horizontal scrolling */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+}
+
+@keyframes windSway {
+  0%, 100% { transform: scale(1.02) rotate(0deg); }
+  50% { transform: scale(1.03) rotate(0.6deg); }
+}
+
+@keyframes sunShimmer {
+  0% { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(100%) translateY(100%); }
+}
+
+@keyframes softPulse {
+  0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(17, 24, 39, 0.4); }
+  50% { opacity: 0.8; transform: scale(1.08); box-shadow: 0 0 0 5px rgba(17, 24, 39, 0); }
+}
+
+@keyframes cloudDrift {
+  0% { transform: translateX(0px); }
+  50% { transform: translateX(-14px); }
+  100% { transform: translateX(0px); }
+}
+
+.animate-wind-sway {
+  animation: windSway 10s ease-in-out infinite;
+}
+
+.animate-sun-shimmer {
+  animation: sunShimmer 8s linear infinite;
+}
+
+.animate-soft-pulse {
+  animation: softPulse 2.5s ease-in-out infinite;
+}
+
+.animate-cloud-drift {
+  animation: cloudDrift 14s ease-in-out infinite;
+}
