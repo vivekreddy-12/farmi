@@ -193,6 +193,13 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       emailReceipt,
     };
 
+    // Automatically send the order receipt as a real message via WhatsApp
+    // click-to-chat. Opened synchronously within the confirm click so the
+    // browser treats it as a user gesture and does not block the popup.
+    if (smsReceipt.whatsappUrl) {
+      window.open(smsReceipt.whatsappUrl, '_blank', 'noopener,noreferrer');
+    }
+
     // If UPI payment method, automatically trigger device payment app deep link
     if (selectedPaymentMethod === 'upi') {
       const appTitle = paymentDetails?.title || 'UPI';
@@ -204,9 +211,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         transactionRef: preliminaryOrder.orderNumber,
         note: `farmin ${preliminaryOrder.orderNumber}`,
       });
-      setSmsNotificationToast(`Opening ${appTitle}... Receipt sent to ${emailReceipt.email} & ${smsReceipt.phone}`);
+      setSmsNotificationToast(`Opening ${appTitle}... Receipt auto-sent via WhatsApp to ${smsReceipt.phone} & email to ${emailReceipt.email}`);
     } else {
-      setSmsNotificationToast(`Receipt sent to ${emailReceipt.email} & SMS to ${smsReceipt.phone}!`);
+      setSmsNotificationToast(`Receipt auto-sent via WhatsApp to ${smsReceipt.phone} & email to ${emailReceipt.email}!`);
     }
 
     setNewOrder(finalOrder);
