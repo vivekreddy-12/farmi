@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product, Order, FarmLocation } from '../types';
+import { Product, Order, FarmLocation, UserProfile } from '../types';
 import { TiltCard } from './TiltCard';
 import { WeatherAtmosphereCanvas } from './WeatherAtmosphereCanvas';
 import { sounds } from '../utils/soundEffects';
@@ -17,6 +17,9 @@ interface HomeScreenProps {
   onViewAllProducts: () => void;
   onViewOrder: (order: Order) => void;
   onOpenConsultation: () => void;
+  user?: UserProfile;
+  onOpenLogin?: () => void;
+  onOpenAccount?: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -32,7 +35,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onViewAllProducts,
   onViewOrder,
   onOpenConsultation,
+  user,
+  onOpenLogin,
+  onOpenAccount,
 }) => {
+  const isUserLoggedIn = !!user?.isLoggedIn;
+  const greetingName = isUserLoggedIn ? user.name.split(' ')[0] : 'Farmer';
+
   return (
     <div className="flex-grow w-full max-w-7xl mx-auto px-5 py-6 space-y-6 pb-24 md:pb-12">
       {/* Location Bar with Change option */}
@@ -48,17 +57,72 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             • {currentLocation.sprayCondition} Spray Window
           </span>
         </div>
-        <button
-          onClick={() => {
-            sounds.playClick();
-            onChangeLocation();
-          }}
-          className="text-[#F1F5F2] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold flex items-center gap-1 bg-[#16241A] px-3 py-1.5 rounded-lg border border-[#1E2E21] hover:border-[#84CC16] hover:text-[#84CC16] active:scale-95 transition-all"
-        >
-          Change
-          <span className="material-symbols-outlined text-sm font-bold">expand_more</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {isUserLoggedIn ? (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenAccount?.();
+              }}
+              className="hidden sm:flex items-center gap-1.5 text-xs text-[#84CC16] bg-[#16241A] px-2.5 py-1 rounded-lg border border-[#1E2E21] hover:border-[#84CC16] font-mono"
+            >
+              <span className="w-2 h-2 rounded-full bg-[#84CC16]" />
+              <span>{user?.email || 'njersey382@gmail.com'}</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                sounds.playClick();
+                onOpenLogin?.();
+              }}
+              className="text-[#84CC16] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold flex items-center gap-1 bg-[#16241A] px-3 py-1.5 rounded-lg border border-[#84CC16] hover:bg-[#84CC16] hover:text-[#0B110D] active:scale-95 transition-all"
+            >
+              <span className="material-symbols-outlined text-[16px]">login</span>
+              Sign In
+            </button>
+          )}
+
+          <button
+            onClick={() => {
+              sounds.playClick();
+              onChangeLocation();
+            }}
+            className="text-[#F1F5F2] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold flex items-center gap-1 bg-[#16241A] px-3 py-1.5 rounded-lg border border-[#1E2E21] hover:border-[#84CC16] hover:text-[#84CC16] active:scale-95 transition-all"
+          >
+            Change
+            <span className="material-symbols-outlined text-sm font-bold">expand_more</span>
+          </button>
+        </div>
       </div>
+
+      {/* Guest Mode Banner Prompt */}
+      {!isUserLoggedIn && (
+        <div className="bg-[#16241A] p-4 rounded-xl border-2 border-[#84CC16]/60 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0B110D] border border-[#84CC16] flex items-center justify-center text-[#84CC16] shrink-0">
+              <span className="material-symbols-outlined text-[22px]">account_circle</span>
+            </div>
+            <div>
+              <div className="text-xs font-['Space_Grotesk',sans-serif] font-black uppercase text-[#F1F5F2]">
+                Sign in to your farmin Agro Account
+              </div>
+              <div className="text-[11px] text-[#9CAFA0] mt-0.5">
+                Automatically sync order invoices to <strong>njersey382@gmail.com</strong>, save GPS field zones, and claim grower subsidies.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              sounds.playClick();
+              onOpenLogin?.();
+            }}
+            className="w-full sm:w-auto px-4 py-2 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-all active:scale-95 shadow-sm shrink-0 flex items-center justify-center gap-1.5"
+          >
+            <span className="material-symbols-outlined text-[16px]">login</span>
+            <span>Sign In / Register</span>
+          </button>
+        </div>
+      )}
 
       {/* Welcome & Weather Bento Grid */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -79,7 +143,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               Daily Farm Advisory
             </div>
             <h1 className="font-['Space_Grotesk',sans-serif] text-3xl sm:text-4xl font-extrabold text-[#F1F5F2] mb-2 tracking-tight">
-              Good morning, Alex.
+              Good morning, {greetingName}.
             </h1>
             <p className="font-['Plus_Jakarta_Sans',sans-serif] text-base text-[#9CAFA0] leading-relaxed max-w-2xl font-medium">
               Soil nutrient levels are optimal across all zones. High photosynthetic activity indicates an ideal window for applying nitrogen to the North Field.
@@ -302,13 +366,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   </span>
                 </div>
                 <div>
-                  <h4 className="font-['Space_Grotesk',sans-serif] text-sm font-extrabold text-[#F1F5F2]">
-                    {order.orderNumber}
-                  </h4>
-                  <p className="font-['Plus_Jakarta_Sans',sans-serif] text-xs text-[#9CAFA0]">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-['Space_Grotesk',sans-serif] text-sm font-extrabold text-[#F1F5F2]">
+                      {order.orderNumber}
+                    </h4>
+                    {order.paymentDetails && (
+                      <span className="text-[9px] font-mono font-bold bg-[#16241A] text-[#84CC16] px-1.5 py-0.5 rounded border border-[#1E2E21]">
+                        {order.paymentDetails.method.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-['Plus_Jakarta_Sans',sans-serif] text-xs text-[#9CAFA0] mt-0.5">
                     {order.status === 'In Transit'
                       ? `Arriving Tomorrow • ${order.itemsCount} items`
-                      : `${order.date} • ${order.itemsCount} item`}
+                      : `${order.date} • ${order.itemsCount} items`}
                   </p>
                 </div>
               </div>

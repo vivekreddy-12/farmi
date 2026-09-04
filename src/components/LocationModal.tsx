@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FarmLocation } from '../types';
 import { FARM_LOCATIONS } from '../data/mockData';
+import { detectCurrentDeliveryLocation } from '../utils/geolocationService';
 
 interface LocationModalProps {
   isOpen: boolean;
@@ -15,7 +16,35 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   currentLocation,
   onSelectLocation,
 }) => {
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [detectError, setDetectError] = useState<string | null>(null);
+
   if (!isOpen) return null;
+
+  const handleAutoDetect = async () => {
+    setIsDetecting(true);
+    setDetectError(null);
+    const result = await detectCurrentDeliveryLocation();
+    setIsDetecting(false);
+
+    if (result.success && result.location) {
+      const detectedLoc: FarmLocation = {
+        id: `loc-gps-${Date.now()}`,
+        name: result.location.cityOrDistrict || result.location.shortAddress || 'Detected Farm Gate',
+        state: result.location.state || 'GPS Location',
+        temperatureF: 74,
+        condition: 'Clear Skies',
+        humidity: '58%',
+        wind: '6 mph WSW',
+        sprayCondition: 'Optimal',
+        forecastSummary: `GPS Detected (±${result.location.accuracyMeters}m accuracy). Clear skies and optimal soil conditions.`,
+      };
+      onSelectLocation(detectedLoc);
+      onClose();
+    } else {
+      setDetectError(result.error?.message || 'Unable to detect location. Please check browser permissions.');
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in-up">
@@ -34,10 +63,37 @@ export const LocationModal: React.FC<LocationModalProps> = ({
           </button>
         </div>
 
-        <div className="p-5 space-y-3">
-          <p className="text-xs text-[#9CAFA0] font-medium font-['Plus_Jakarta_Sans',sans-serif]">
-            Switching field locations updates the local weather window, humidity, and optimal spraying advisory.
-          </p>
+        <div className="p-5 space-y-3.5 max-h-[80vh] overflow-y-auto">
+          {/* Auto Detect GPS Button */}
+          <div className="space-y-1.5">
+            <button
+              type="button"
+              onClick={handleAutoDetect}
+              disabled={isDetecting}
+              className={`w-full p-3 rounded-xl border-2 font-['Space_Grotesk',sans-serif] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all active:scale-95 ${
+                isDetecting
+                  ? 'border-[#84CC16] bg-[#16241A] text-[#84CC16] animate-pulse cursor-wait'
+                  : 'border-[#84CC16] bg-[#84CC16] text-[#0B110D] hover:bg-[#99E321]'
+              }`}
+            >
+              <span className={`material-symbols-outlined text-[18px] ${isDetecting ? 'animate-spin' : ''}`}>
+                {isDetecting ? 'sync' : 'my_location'}
+              </span>
+              <span>{isDetecting ? 'Detecting GPS Location...' : 'Auto Detect My Farm Location (GPS)'}</span>
+            </button>
+
+            {detectError && (
+              <p className="text-[11px] text-[#ef4444] bg-[#ef4444]/10 border border-[#ef4444]/30 p-2 rounded-lg">
+                {detectError}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 text-[#9CAFA0] text-[10px] uppercase font-bold tracking-widest my-2">
+            <span className="flex-grow h-px bg-[#1E2E21]"></span>
+            <span>Or Choose Saved Field</span>
+            <span className="flex-grow h-px bg-[#1E2E21]"></span>
+          </div>
 
           <div className="space-y-2.5">
             {FARM_LOCATIONS.map((loc) => {

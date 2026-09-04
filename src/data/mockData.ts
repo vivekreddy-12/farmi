@@ -1,9 +1,34 @@
-import { CropGuide, Product, Order, FarmLocation, FAQItem } from '../types';
+import { CropGuide, Product, Order, FarmLocation, FAQItem, UserProfile } from '../types';
 
 export const FARMIN_LOGO = '/src/assets/images/farmin_logo_icon_1788274974140.jpg';
 export const USER_AVATAR = '/src/assets/images/farmin_logo_icon_1788274974140.jpg';
 export const SUPPORT_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDsMK2K7Icfnh8CVnjI2qcB2F7JXE7S1l14fium94PmXkUPw0Cf2NpVYBc6eXaWg3INQ38WjS91c-w8jXK2l7vXQ5ezftZ_gZF2HPe5q6paCWEuAEVLf3xu_fLoEK7xbkkr7mGutJJcZJyvMqTcRco-ZoS4fLZxEBsIS3gV-nyyFOPhRAPZpRIT_pqQFbtu59IHKMT5FS0uRImULDyTD9v1ok4QWMJfXk-O-5pdUWRUXsTpLz56kA6zrg';
 export const SUPPORT_CENTER_IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAMWIbja1VZ0ULtuvvVKN-ge93zf2PnlqEdTiYv61iOlCjQPG24BKSbCSD-Ontdq2UxzqSFVwm2bzn6HvsQVIy1CZIQV0gy28BUKhmByd0vb6X3cqjbCFhu5pdr6y94iXLw4I-MLkVbym6JHYRkYExqN6qDuoY5CiFTHaL4JQbm--8A1KnwQCjqxuk-G0FtC8nWkkAhjguSEo7J-qVMb8srv_Mscd0wzji90x-ax1UnWSHHEJVKmhZYg';
+
+export const DEFAULT_USER_PROFILE: UserProfile = {
+  id: 'usr-938210',
+  name: 'Alex Miller',
+  email: 'njersey382@gmail.com',
+  phone: '+91 9391216686',
+  farmName: 'Miller Organic Field Station',
+  location: 'Kansas City, MO (Zone 6A)',
+  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+  isLoggedIn: true,
+  memberSince: 'March 2024',
+  kisanId: 'FARMIN-KISAN-9831',
+  role: 'Verified Commercial Grower',
+};
+
+export const GUEST_USER_PROFILE: UserProfile = {
+  id: 'guest',
+  name: 'Guest Farmer',
+  email: '',
+  phone: '',
+  farmName: 'My Farmstead',
+  location: 'Select Location',
+  avatar: '',
+  isLoggedIn: false,
+};
 
 export const FARM_LOCATIONS: FarmLocation[] = [
   {
@@ -420,10 +445,43 @@ export const INITIAL_ORDERS: Order[] = [
     badgeClass: 'bg-secondary-container text-on-secondary-container',
     itemsCount: 3,
     total: 6497.00,
+    subtotal: 6187.62,
+    tax: 309.38,
+    shipping: 0,
     icon: 'local_shipping',
     destination: 'Alex Miller - North Field Gate 2, Kansas City MO',
     trackingNumber: 'FP-TRK-9821440',
     estimatedDelivery: 'Arriving Tomorrow by 2:00 PM',
+    recipientPhone: '+91 9391216686',
+    recipientEmail: 'njersey382@gmail.com',
+    smsReceipt: {
+      phone: '+91 9391216686',
+      sentAt: '02:45 PM',
+      messageId: 'SMS-FARMIN-849201',
+      gateway: 'Airtel Enterprise SMS Hub / DLT-AGRI-049',
+      status: 'Delivered',
+      smsContent: '[farmin AGRO RECEIPT]\nOrder ID: Order #FP-8472\nDate: Oct 28, 2026\nRecipient Phone: 9391216686\n\nItems:\n• Pro-Gro Nitrogen Plus 46-0-0 (x3) - ₹5997.00\n• EcoBalance Organic Conditioner (x1) - ₹899.00\n• Time-Release NPK Pellets (x1) - ₹1249.00\nDelivery: FREE\nGST (5%): ₹309.38\nTOTAL AMOUNT: ₹6,497.00\n\nPayment: UPI - Google Pay (Paid)\nTracking: FP-TRK-9821440\nEstimated Delivery: Arriving Tomorrow by 2:00 PM\nGate: Alex Miller - North Field Gate 2, Kansas City MO\n\nThank you for choosing farmin Agro Solutions!\nSupport: 1800-419-AGRO',
+      whatsappUrl: 'https://wa.me/919391216686',
+    },
+    emailReceipt: {
+      email: 'njersey382@gmail.com',
+      sentAt: '02:45 PM',
+      messageId: 'MAIL-FARMIN-849201',
+      gateway: 'farmin Cloud Mail Relay (SES-SMTP-AGRI)',
+      status: 'Delivered',
+      subject: '🧾 farmin Agro Order Receipt & Tax Invoice - Order #FP-8472 (₹6,497.00)',
+      textContent: 'Order confirmed and digital tax invoice generated for njersey382@gmail.com',
+      htmlContent: '',
+      mailtoUrl: 'mailto:njersey382@gmail.com?subject=farmin%20Order%20Receipt',
+    },
+    paymentDetails: {
+      method: 'upi',
+      title: 'UPI - PhonePe (9391216686@ybl)',
+      subtitle: 'Instant Settlement • 0% Transaction Surcharge',
+      icon: 'qr_code_scanner',
+      status: 'Paid',
+      transactionRef: 'UPI-TXN-84920194',
+    },
     items: [
       { product: INITIAL_PRODUCTS[0], quantity: 3 }, // Pro-Gro Nitrogen Plus x 3
       { product: INITIAL_PRODUCTS[1], quantity: 1 }, // EcoBalance Conditioner x 1
@@ -441,10 +499,43 @@ export const INITIAL_ORDERS: Order[] = [
     badgeClass: 'bg-surface-variant text-on-surface-variant',
     itemsCount: 1,
     total: 1499.00,
+    subtotal: 1189.52,
+    tax: 59.48,
+    shipping: 250.00,
     icon: 'check_circle',
     destination: 'Alex Miller - Farm Barn Storage, Kansas City MO',
     trackingNumber: 'FP-TRK-7410293',
     estimatedDelivery: 'Delivered Oct 12, 2026',
+    recipientPhone: '+91 9391216686',
+    recipientEmail: 'njersey382@gmail.com',
+    smsReceipt: {
+      phone: '+91 9391216686',
+      sentAt: '11:10 AM',
+      messageId: 'SMS-FARMIN-730192',
+      gateway: 'Airtel Enterprise SMS Hub / DLT-AGRI-049',
+      status: 'Delivered',
+      smsContent: '[farmin AGRO RECEIPT]\nOrder ID: Order #FP-8391\nDate: Oct 12, 2026\nRecipient Phone: 9391216686\n\nItems:\n• Pro-Gro Nitrogen Plus 46-0-0 (x1) - ₹1999.00\nDelivery: ₹250.00\nGST (5%): ₹59.48\nTOTAL AMOUNT: ₹1,499.00\n\nPayment: Visa Agri Corporate (•••• 8821) (Paid)\nTracking: FP-TRK-7410293\nEstimated Delivery: Delivered Oct 12, 2026\nGate: Alex Miller - Farm Barn Storage, Kansas City MO\n\nThank you for choosing farmin Agro Solutions!\nSupport: 1800-419-AGRO',
+      whatsappUrl: 'https://wa.me/919391216686',
+    },
+    emailReceipt: {
+      email: 'njersey382@gmail.com',
+      sentAt: '11:10 AM',
+      messageId: 'MAIL-FARMIN-730192',
+      gateway: 'farmin Cloud Mail Relay (SES-SMTP-AGRI)',
+      status: 'Delivered',
+      subject: '🧾 farmin Agro Order Receipt & Tax Invoice - Order #FP-8391 (₹1,499.00)',
+      textContent: 'Order confirmed and digital tax invoice generated for njersey382@gmail.com',
+      htmlContent: '',
+      mailtoUrl: 'mailto:njersey382@gmail.com?subject=farmin%20Order%20Receipt',
+    },
+    paymentDetails: {
+      method: 'card',
+      title: 'Visa Agri Corporate (•••• 8821)',
+      subtitle: 'Secured via RBI Compliant 256-bit Tokenization',
+      icon: 'credit_card',
+      status: 'Paid',
+      transactionRef: 'CRD-AUTH-839102',
+    },
     items: [
       { product: INITIAL_PRODUCTS[0], quantity: 1 },
     ],

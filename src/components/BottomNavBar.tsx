@@ -1,15 +1,21 @@
 import React from 'react';
-import { ScreenType } from '../types';
+import { ScreenType, UserProfile } from '../types';
 
 interface BottomNavBarProps {
   currentScreen: ScreenType;
   onNavigate: (screen: ScreenType) => void;
   cartItemsCount: number;
+  user?: UserProfile;
+  onOpenLogin?: () => void;
+  onOpenAccount?: () => void;
 }
 
 export const BottomNavBar: React.FC<BottomNavBarProps> = ({
   currentScreen,
   onNavigate,
+  user,
+  onOpenLogin,
+  onOpenAccount,
 }) => {
   return (
     <nav className="md:hidden fixed bottom-0 w-full z-50 bg-[#111A13]/95 backdrop-blur-md border-t-2 border-[#1E2E21] pb-safe">
@@ -95,6 +101,25 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           </span>
           <span className="font-['Space_Grotesk',sans-serif] text-[10px] uppercase font-bold tracking-wider leading-none">
             Support
+          </span>
+        </button>
+
+        {/* Account / Login */}
+        <button
+          onClick={() => {
+            if (user?.isLoggedIn) {
+              onOpenAccount?.();
+            } else {
+              onOpenLogin?.();
+            }
+          }}
+          className="flex flex-col items-center justify-center transition-all duration-150 active:scale-95 py-1 px-3 rounded-lg text-[#9CAFA0] hover:text-[#F1F5F2]"
+        >
+          <span className="material-symbols-outlined text-[22px] mb-0.5 text-[#84CC16]">
+            {user?.isLoggedIn ? 'account_circle' : 'login'}
+          </span>
+          <span className="font-['Space_Grotesk',sans-serif] text-[10px] uppercase font-bold tracking-wider leading-none">
+            {user?.isLoggedIn ? 'Account' : 'Login'}
           </span>
         </button>
       </div>

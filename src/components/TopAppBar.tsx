@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScreenType } from '../types';
+import { ScreenType, UserProfile } from '../types';
 import { USER_AVATAR } from '../data/mockData';
 
 interface TopAppBarProps {
@@ -9,6 +9,9 @@ interface TopAppBarProps {
   onOpenCart: () => void;
   onOpenSoilScan?: () => void;
   cartItemsCount: number;
+  user: UserProfile;
+  onOpenLogin: () => void;
+  onOpenAccount: () => void;
 }
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({
@@ -18,6 +21,9 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
   onOpenCart,
   onOpenSoilScan,
   cartItemsCount,
+  user,
+  onOpenLogin,
+  onOpenAccount,
 }) => {
   return (
     <>
@@ -157,6 +163,42 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
                 </span>
               )}
             </button>
+
+            {/* User Login / Account Button (Desktop) */}
+            {user.isLoggedIn ? (
+              <button
+                onClick={onOpenAccount}
+                className="h-10 pl-2 pr-3 flex items-center gap-2 rounded-lg border-2 border-[#1E2E21] hover:border-[#84CC16] bg-[#16241A] hover:bg-[#1E2E21] text-[#F1F5F2] transition-all active:scale-95 group"
+                title={`Logged in as ${user.name} (${user.email})`}
+              >
+                <div className="w-6 h-6 rounded-full overflow-hidden border border-[#84CC16] bg-[#0B110D] shrink-0">
+                  {user.avatar ? (
+                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-[#84CC16] text-[#0B110D]">
+                      {user.name.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <div className="text-left hidden lg:block">
+                  <span className="text-xs font-['Space_Grotesk',sans-serif] font-bold text-[#F1F5F2] block leading-none">
+                    {user.name.split(' ')[0]}
+                  </span>
+                  <span className="text-[9px] text-[#84CC16] font-mono block leading-none mt-0.5">
+                    Account
+                  </span>
+                </div>
+              </button>
+            ) : (
+              <button
+                onClick={onOpenLogin}
+                className="h-10 px-3.5 flex items-center gap-1.5 rounded-lg border-2 border-[#84CC16] bg-[#16241A] hover:bg-[#84CC16] hover:text-[#0B110D] text-[#84CC16] transition-all active:scale-95 font-extrabold text-xs uppercase tracking-wider shadow-sm"
+                title="Sign In / Register"
+              >
+                <span className="material-symbols-outlined text-[18px]">account_circle</span>
+                <span>Login</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -213,6 +255,33 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               </span>
             )}
           </button>
+
+          {/* User Profile / Login (Mobile) */}
+          {user.isLoggedIn ? (
+            <button
+              onClick={onOpenAccount}
+              aria-label="User Account"
+              className="h-9 w-9 rounded-lg border-2 border-[#84CC16]/80 overflow-hidden bg-[#0B110D] active:scale-95 transition-transform shrink-0"
+              title="My Account"
+            >
+              {user.avatar ? (
+                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-xs font-black bg-[#84CC16] text-[#0B110D]">
+                  {user.name.charAt(0)}
+                </div>
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={onOpenLogin}
+              aria-label="Sign In"
+              className="h-9 px-2.5 rounded-lg border-2 border-[#84CC16] bg-[#16241A] text-[#84CC16] text-xs font-bold font-['Space_Grotesk',sans-serif] flex items-center gap-1 active:scale-95 transition-transform shrink-0"
+            >
+              <span className="material-symbols-outlined text-[16px]">login</span>
+              <span>Login</span>
+            </button>
+          )}
         </div>
       </header>
     </>

@@ -1,7 +1,7 @@
 {
   "name": "farmin",
   "description": "Comprehensive agricultural management, crop knowledge hub, fertilizer store, and expert agronomy support.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
 

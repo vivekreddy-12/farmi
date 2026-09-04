@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { ScreenType, CropGuide, Product, Order, OrderItem, FarmLocation, ConsultationBooking } from './types';
+import React, { useState, useEffect } from 'react';
+import { ScreenType, CropGuide, Product, Order, OrderItem, FarmLocation, ConsultationBooking, UserProfile } from './types';
 import {
   INITIAL_PRODUCTS,
   CROP_GUIDES,
   INITIAL_ORDERS,
   FARM_LOCATIONS,
   FAQS,
+  DEFAULT_USER_PROFILE,
+  GUEST_USER_PROFILE,
 } from './data/mockData';
 import { TopAppBar } from './components/TopAppBar';
 import { BottomNavBar } from './components/BottomNavBar';
@@ -24,11 +26,34 @@ import { SearchModal } from './components/SearchModal';
 import { ApplicationGuidesModal } from './components/ApplicationGuidesModal';
 import { VideoTutorialsModal } from './components/VideoTutorialsModal';
 import { SoilScanModal } from './components/SoilScanModal';
+import { AuthModal } from './components/AuthModal';
+import { UserAccountModal } from './components/UserAccountModal';
 
 export default function App() {
   // Navigation
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // User Authentication State
+  const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
+    try {
+      const saved = localStorage.getItem('farmin_user');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch {
+      // Fallback
+    }
+    return DEFAULT_USER_PROFILE;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('farmin_user', JSON.stringify(currentUser));
+    } catch {
+      // Ignore
+    }
+  }, [currentUser]);
 
   // App State
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -54,6 +79,8 @@ export default function App() {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isAppGuidesOpen, setIsAppGuidesOpen] = useState(false);
   const [isVideoTutorialsOpen, setIsVideoTutorialsOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
 
   // Toast Feedback State
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -61,6 +88,22 @@ export default function App() {
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
+  };
+
+  // Auth Handlers
+  const handleLoginSuccess = (user: UserProfile) => {
+    setCurrentUser(user);
+    showToast(`Welcome, ${user.name}! Connected as ${user.email}`);
+  };
+
+  const handleUpdateUser = (updated: UserProfile) => {
+    setCurrentUser(updated);
+    showToast('Grower profile updated');
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(GUEST_USER_PROFILE);
+    showToast('Signed out. Switched to Guest Farmer mode.');
   };
 
   // Cart Handlers
@@ -101,7 +144,7 @@ export default function App() {
   const handleCheckoutComplete = (newOrder: Order) => {
     setRecentOrders((prev) => [newOrder, ...prev]);
     setCartItems([]);
-    showToast(`Order ${newOrder.orderNumber} successfully placed!`);
+    showToast(`Order ${newOrder.orderNumber} placed! Receipt sent to ${currentUser.email || 'njersey382@gmail.com'}`);
   };
 
   const handleBookConsultation = (booking: Omit<ConsultationBooking, 'id' | 'status'>) => {
@@ -153,6 +196,9 @@ export default function App() {
           onOpenCart={() => setIsCartOpen(true)}
           onOpenSoilScan={() => setIsSoilScanOpen(true)}
           cartItemsCount={totalCartCount}
+          user={currentUser}
+          onOpenLogin={() => setIsAuthModalOpen(true)}
+          onOpenAccount={() => setIsAccountModalOpen(true)}
         />
       </div>
 
@@ -175,6 +221,9 @@ export default function App() {
             setCurrentScreen('support');
             window.scrollTo({ top: 400, behavior: 'smooth' });
           }}
+          user={currentUser}
+          onOpenLogin={() => setIsAuthModalOpen(true)}
+          onOpenAccount={() => setIsAccountModalOpen(true)}
         />
       )}
 
@@ -216,12 +265,15 @@ export default function App() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         cartItemsCount={totalCartCount}
+        user={currentUser}
+        onOpenLogin={() => setIsAuthModalOpen(true)}
+        onOpenAccount={() => setIsAccountModalOpen(true)}
       />
 
       {/* Toast Notification Banner */}
       {toastMessage && (
-        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#1b1c1c] text-[#ffffff] px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-bold animate-fade-in-up border border-[#40493d]">
-          <span className="material-symbols-outlined text-[#cbffc2] text-[18px]">
+        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#16241A] text-[#F1F5F2] px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-bold animate-fade-in-up border-2 border-[#84CC16]">
+          <span className="material-symbols-outlined text-[#84CC16] text-[18px]">
             check_circle
           </span>
           <span>{toastMessage}</span>
@@ -309,6 +361,29 @@ export default function App() {
       <VideoTutorialsModal
         isOpen={isVideoTutorialsOpen}
         onClose={() => setIsVideoTutorialsOpen(false)}
+      />
+
+      {/* User Login Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+        defaultEmail="njersey382@gmail.com"
+        defaultPhone="9391216686"
+      />
+
+      {/* User Account / Profile Modal */}
+      <UserAccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
+        user={currentUser}
+        onUpdateUser={handleUpdateUser}
+        onLogout={handleLogout}
+        orders={recentOrders}
+        onOpenOrder={(ord) => {
+          setIsAccountModalOpen(false);
+          setSelectedOrder(ord);
+        }}
       />
     </div>
   );
