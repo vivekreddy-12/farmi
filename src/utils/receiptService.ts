@@ -287,6 +287,36 @@ export function dispatchOrderReceiptEmail(order: Order, email: string = DEFAULT_
 }
 
 /**
+ * Sends the order receipt email to the creator via the secure /api/send-receipt
+ * endpoint (Resend). Fire-and-forget: never blocks or breaks the checkout flow.
+ * Returns true when the email was accepted by the server.
+ */
+export async function sendOrderReceiptToCreator(order: Order): Promise<boolean> {
+  try {
+    const email = order.recipientEmail || DEFAULT_RECEIPT_EMAIL;
+    const res = await fetch('/api/send-receipt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: generateReceiptEmailSubject(order),
+        html: generateReceiptEmailHtml(order, email),
+        text: generateReceiptEmailText(order, email),
+        orderNumber: order.orderNumber,
+      }),
+    });
+    if (!res.ok) {
+      const info = await res.json().catch(() => ({}));
+      console.error('[v0] Receipt email failed:', res.status, info?.error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error('[v0] Receipt email request error:', (err as Error).message);
+    return false;
+  }
+}
+
+/**
  * Downloads a plaintext digital invoice receipt file to the device.
  */
 export function downloadReceiptText(order: Order): void {

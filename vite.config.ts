@@ -1,11 +1,22 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import {defineConfig, loadEnv} from 'vite';
+import {receiptEmailPlugin} from './server/receiptEmailPlugin';
 
-export default defineConfig(() => {
+export default defineConfig(({mode}) => {
+  // Load ALL env vars (including non-VITE_ server secrets) so the receipt
+  // email plugin can access RESEND_API_KEY without exposing it to the client.
+  const env = loadEnv(mode, process.cwd(), '');
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react(),
+      tailwindcss(),
+      receiptEmailPlugin({
+        resendApiKey: env.RESEND_API_KEY,
+        resendEmailDomain: env.RESEND_EMAIL_DOMAIN,
+      }),
+    ],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
