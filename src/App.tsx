@@ -28,6 +28,7 @@ import { VideoTutorialsModal } from './components/VideoTutorialsModal';
 import { SoilScanModal } from './components/SoilScanModal';
 import { AuthModal } from './components/AuthModal';
 import { UserAccountModal } from './components/UserAccountModal';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export default function App() {
   // Navigation
@@ -385,6 +386,9 @@ export default function App() {
           setSelectedOrder(ord);
         }}
       />
+
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
     </div>
   );
 }
