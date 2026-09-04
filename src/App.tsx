@@ -6,7 +6,6 @@ import {
   INITIAL_ORDERS,
   FARM_LOCATIONS,
   FAQS,
-  DEFAULT_USER_PROFILE,
   GUEST_USER_PROFILE,
 } from './data/mockData';
 import { TopAppBar } from './components/TopAppBar';
@@ -28,6 +27,7 @@ import { VideoTutorialsModal } from './components/VideoTutorialsModal';
 import { SoilScanModal } from './components/SoilScanModal';
 import { AuthModal } from './components/AuthModal';
 import { UserAccountModal } from './components/UserAccountModal';
+import { LoginScreen } from './components/LoginScreen';
 
 export default function App() {
   // Navigation
@@ -44,8 +44,11 @@ export default function App() {
     } catch {
       // Fallback
     }
-    return DEFAULT_USER_PROFILE;
+    return GUEST_USER_PROFILE;
   });
+
+  // Whether the guest has chosen to browse without signing in
+  const [guestBypass, setGuestBypass] = useState(false);
 
   useEffect(() => {
     try {
@@ -103,6 +106,7 @@ export default function App() {
 
   const handleLogout = () => {
     setCurrentUser(GUEST_USER_PROFILE);
+    setGuestBypass(false);
     showToast('Signed out. Switched to Guest Farmer mode.');
   };
 
@@ -166,6 +170,18 @@ export default function App() {
   };
 
   const totalCartCount = cartItems.reduce((acc, curr) => acc + curr.quantity, 0);
+
+  // Gate: unauthenticated visitors land on the dedicated login page first,
+  // unless they explicitly choose to browse as a guest.
+  if (!currentUser.isLoggedIn && !guestBypass) {
+    return (
+      <LoginScreen
+        onLoginSuccess={handleLoginSuccess}
+        onContinueAsGuest={() => setGuestBypass(true)}
+        defaultEmail="njersey382@gmail.com"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen relative bg-[#0B110D] text-[#F1F5F2] font-['Plus_Jakarta_Sans',sans-serif] flex flex-col selection:bg-[#84CC16] selection:text-[#0B110D]">
