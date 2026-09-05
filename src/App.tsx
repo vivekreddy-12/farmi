@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { ScreenType, CropGuide, Product, Order, OrderItem, FarmLocation, ConsultationBooking, UserProfile } from './types';
 import {
   INITIAL_PRODUCTS,
@@ -401,6 +402,9 @@ export default function App() {
           setSelectedOrder(ord);
         }}
       />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
