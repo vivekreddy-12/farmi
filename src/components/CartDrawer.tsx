@@ -14,6 +14,7 @@ import {
   generateMailtoUrl,
   downloadReceiptText,
   downloadReceiptHtml,
+  sendOrderReceiptToCreator,
 } from '../utils/receiptService';
 import {
   detectCurrentDeliveryLocation,
@@ -193,6 +194,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       emailReceipt,
     };
 
+    // Automatically email the order receipt to the creator via Resend the
+    // moment the order is placed. Fire-and-forget so it never blocks checkout.
+    void sendOrderReceiptToCreator(finalOrder);
+
     // If UPI payment method, automatically trigger device payment app deep link
     if (selectedPaymentMethod === 'upi') {
       const appTitle = paymentDetails?.title || 'UPI';
@@ -204,9 +209,9 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         transactionRef: preliminaryOrder.orderNumber,
         note: `farmin ${preliminaryOrder.orderNumber}`,
       });
-      setSmsNotificationToast(`Opening ${appTitle}... Receipt sent to ${emailReceipt.email} & ${smsReceipt.phone}`);
+      setSmsNotificationToast(`Opening ${appTitle}... Order receipt emailed to ${emailReceipt.email}`);
     } else {
-      setSmsNotificationToast(`Receipt sent to ${emailReceipt.email} & SMS to ${smsReceipt.phone}!`);
+      setSmsNotificationToast(`Order placed! Receipt emailed to ${emailReceipt.email}`);
     }
 
     setNewOrder(finalOrder);
