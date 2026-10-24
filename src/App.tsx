@@ -9,6 +9,14 @@ import {
   FAQS,
   GUEST_USER_PROFILE,
 } from './data/mockData';
+import { supabase, isSupabaseConfigured } from './lib/supabase';
+import {
+  fetchFarmerProfile,
+  saveFarmerProfile,
+  fetchFarmerOrders,
+  saveFarmerOrder,
+  signOutFarmer,
+} from './services/supabaseService';
 import { TopAppBar } from './components/TopAppBar';
 import { BottomNavBar } from './components/BottomNavBar';
 import { HomeScreen } from './components/HomeScreen';
@@ -51,14 +59,6 @@ export default function App() {
   // Whether the guest has chosen to browse without signing in
   const [guestBypass, setGuestBypass] = useState(false);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('farmin_user', JSON.stringify(currentUser));
-    } catch {
-      // Ignore
-    }
-  }, [currentUser]);
-
   // App State
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [cropGuides] = useState<CropGuide[]>(CROP_GUIDES);
@@ -67,8 +67,8 @@ export default function App() {
   
   // Cart State
   const [cartItems, setCartItems] = useState<OrderItem[]>([
-    { product: INITIAL_PRODUCTS[0], quantity: 2 }, // 2 bags of Pro-Gro Nitrogen Plus
-    { product: INITIAL_PRODUCTS[1], quantity: 1 }, // 1 gal EcoBalance
+    { product: INITIAL_PRODUCTS[0], quantity: 2 },
+    { product: INITIAL_PRODUCTS[1], quantity: 1 },
   ]);
 
   // Modal / Drawer States
@@ -91,23 +91,116 @@ export default function App() {
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
+    setTimeout(() => setToastMessage(null), 3500);
   };
+
+  // Sync session and orders with Supabase on mount
+  useEffect(() => {
+    async function initSupabaseSession() {
+      if (!isSupabaseConfigured) return;
+
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          const profile = await fetchFarmerProfile(session.user.id);
+          if (profile) {
+            setCurrentUser(profile);
+          } else {
+            const meta = session.user.user_metadata || {};
+            setCurrentUser({
+              id: session.user.id,
+              name: meta.full_name || session.user.email?.split('@')[0] || 'Grower',
+              email: session.user.email || '',
+              phone: meta.phone || '',
+              farmName: meta.farm_name || 'My Farmstead',
+              location: 'Select Location',
+              avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250',
+              isLoggedIn: true,
+              memberSince: 'October 2026',
+              kisanId: `FARMIN-${session.user.id.slice(0, 4).toUpperCase()}`,
+              role: 'Verified Grower',
+            });
+          }
+
+          // Fetch orders stored in Supabase
+          const cloudOrders = await fetchFarmerOrders(session.user.id);
+          if (cloudOrders && cloudOrders.length > 0) {
+            setRecentOrders(cloudOrders);
+          }
+        }
+      } catch (err) {
+        console.error('[farmin] Failed to restore Supabase session:', err);
+      }
+
+      // Listen to Supabase Auth State changes
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) {
+          const profile = await fetchFarmerProfile(session.user.id);
+          if (profile) {
+            setCurrentUser(profile);
+          }
+          const cloudOrders = await fetchFarmerOrders(session.user.id);
+          if (cloudOrders && cloudOrders.length > 0) {
+            setRecentOrders(cloudOrders);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          setCurrentUser(GUEST_USER_PROFILE);
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+
+    initSupabaseSession();
+  }, []);
+
+  // Persist fallback to local storage
+  useEffect(() => {
+    try {
+      localStorage.setItem('farmin_user', JSON.stringify(currentUser));
+    } catch {
+      // Ignore
+    }
+  }, [currentUser]);
 
   // Auth Handlers
-  const handleLoginSuccess = (user: UserProfile) => {
+  const handleLoginSuccess = async (user: UserProfile) => {
     setCurrentUser(user);
-    showToast(`Welcome, ${user.name}! Connected as ${user.email}`);
+    if (isSupabaseConfigured && user.id && user.id !== 'guest') {
+      const orders = await fetchFarmerOrders(user.id);
+      if (orders && orders.length > 0) {
+        setRecentOrders(orders);
+      }
+    }
+    showToast(`Welcome, ${user.name}! Connected to farmin Cloud`);
   };
 
-  const handleUpdateUser = (updated: UserProfile) => {
+  const handleUpdateUser = async (updated: UserProfile) => {
     setCurrentUser(updated);
-    showToast('Grower profile updated');
+    if (isSupabaseConfigured && updated.id && updated.id !== 'guest') {
+      await saveFarmerProfile(updated);
+      showToast('Grower profile synced to Supabase Cloud');
+    } else {
+      showToast('Grower profile updated locally');
+    }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (isSupabaseConfigured) {
+      await signOutFarmer();
+    }
     setCurrentUser(GUEST_USER_PROFILE);
     setGuestBypass(false);
+    try {
+      localStorage.removeItem('farmin_user');
+    } catch {}
     showToast('Signed out. Switched to Guest Farmer mode.');
   };
 
@@ -146,10 +239,16 @@ export default function App() {
     showToast('Item removed from cart');
   };
 
-  const handleCheckoutComplete = (newOrder: Order) => {
+  const handleCheckoutComplete = async (newOrder: Order) => {
     setRecentOrders((prev) => [newOrder, ...prev]);
     setCartItems([]);
-    showToast(`Order ${newOrder.orderNumber} placed! Receipt sent to ${currentUser.email || 'njersey382@gmail.com'}`);
+
+    if (isSupabaseConfigured && currentUser.isLoggedIn && currentUser.id !== 'guest') {
+      await saveFarmerOrder(newOrder, currentUser.id);
+      showToast(`Order ${newOrder.orderNumber} saved to Supabase! Receipt sent.`);
+    } else {
+      showToast(`Order ${newOrder.orderNumber} placed! Receipt sent to ${currentUser.email || 'farmer'}`);
+    }
   };
 
   const handleBookConsultation = (booking: Omit<ConsultationBooking, 'id' | 'status'>) => {
@@ -199,79 +298,83 @@ export default function App() {
           backgroundImage: `url('/src/assets/images/organic_soil_farm_1788271809867.jpg')`,
         }}
       />
-      <div className="fixed inset-0 pointer-events-none z-0 bg-radial from-transparent via-[#0B110D]/60 to-[#0B110D]/95" />
 
-      {/* Top App Bar */}
-      <div className="relative z-20">
-        <TopAppBar
-          currentScreen={currentScreen}
-          onNavigate={(s) => {
-            setCurrentScreen(s);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-          onOpenSearch={() => setIsSearchModalOpen(true)}
-          onOpenCart={() => setIsCartOpen(true)}
-          onOpenSoilScan={() => setIsSoilScanOpen(true)}
-          cartItemsCount={totalCartCount}
-          user={currentUser}
-          onOpenLogin={() => setIsAuthModalOpen(true)}
-          onOpenAccount={() => setIsAccountModalOpen(true)}
-        />
-      </div>
-
-      {/* Screen Views */}
-      <main className="relative z-10 flex-grow flex flex-col">
-      {currentScreen === 'home' && (
-        <HomeScreen
-          currentLocation={currentLocation}
-          onChangeLocation={() => setIsLocationModalOpen(true)}
-          featuredProducts={products.slice(0, 4)}
-          recentOrders={recentOrders}
-          onOrderFertilizer={() => setCurrentScreen('products')}
-          onOpenCropCare={() => setIsCropCareModalOpen(true)}
-          onOpenSoilScan={() => setIsSoilScanOpen(true)}
-          onViewProduct={(p) => setSelectedProduct(p)}
-          onAddToCart={handleAddToCart}
-          onViewAllProducts={() => setCurrentScreen('products')}
-          onViewOrder={(ord) => setSelectedOrder(ord)}
-          onOpenConsultation={() => {
-            setCurrentScreen('support');
-            window.scrollTo({ top: 400, behavior: 'smooth' });
-          }}
-          user={currentUser}
-          onOpenLogin={() => setIsAuthModalOpen(true)}
-          onOpenAccount={() => setIsAccountModalOpen(true)}
-        />
+      {/* Global Toast Feedback */}
+      {toastMessage && (
+        <div className="fixed top-20 right-4 z-50 animate-bounce bg-[#16241A] border-2 border-[#84CC16] text-[#F1F5F2] px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold backdrop-blur-md">
+          <span className="w-2 h-2 rounded-full bg-[#84CC16] animate-ping" />
+          <span>{toastMessage}</span>
+        </div>
       )}
 
-      {currentScreen === 'knowledge' && (
-        <KnowledgeScreen
-          cropGuides={cropGuides}
-          onSelectCropGuide={(guide) => setSelectedCropGuide(guide)}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      )}
+      {/* Top Application Bar */}
+      <TopAppBar
+        currentLocation={currentLocation}
+        onOpenLocationModal={() => setIsLocationModalOpen(true)}
+        onOpenLiveChat={() => setIsLiveChatOpen(true)}
+        onOpenSearch={() => setIsSearchModalOpen(true)}
+        onOpenCart={() => setIsCartOpen(true)}
+        cartItemCount={totalCartCount}
+        user={currentUser}
+        onOpenLoginModal={() => setIsAuthModalOpen(true)}
+        onOpenAccountModal={() => setIsAccountModalOpen(true)}
+      />
 
-      {currentScreen === 'products' && (
-        <ProductsScreen
-          products={products}
-          onAddToCart={handleAddToCart}
-          onViewProduct={(p) => setSelectedProduct(p)}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
-      )}
+      {/* Main Content Area */}
+      <main className="flex-grow z-10 pb-28 pt-20 px-3 sm:px-6 max-w-7xl mx-auto w-full">
+        {currentScreen === 'home' && (
+          <HomeScreen
+            cropGuides={cropGuides}
+            products={products}
+            recentOrders={recentOrders}
+            currentLocation={currentLocation}
+            onSelectCropGuide={(guide) => setSelectedCropGuide(guide)}
+            onOrderCropFertilizer={handleOrderSpecificProduct}
+            onOrderFertilizer={() => setCurrentScreen('products')}
+            onOpenCropCare={() => setIsCropCareModalOpen(true)}
+            onOpenSoilScan={() => setIsSoilScanOpen(true)}
+            onViewProduct={(p) => setSelectedProduct(p)}
+            onAddToCart={handleAddToCart}
+            onViewAllProducts={() => setCurrentScreen('products')}
+            onViewOrder={(ord) => setSelectedOrder(ord)}
+            onOpenConsultation={() => {
+              setCurrentScreen('support');
+              window.scrollTo({ top: 400, behavior: 'smooth' });
+            }}
+            user={currentUser}
+            onOpenLogin={() => setIsAuthModalOpen(true)}
+            onOpenAccount={() => setIsAccountModalOpen(true)}
+          />
+        )}
 
-      {currentScreen === 'support' && (
-        <SupportScreen
-          faqs={FAQS}
-          onOpenLiveChat={() => setIsLiveChatOpen(true)}
-          onBookConsultation={handleBookConsultation}
-          onOpenApplicationGuides={() => setIsAppGuidesOpen(true)}
-          onOpenVideoTutorials={() => setIsVideoTutorialsOpen(true)}
-        />
-      )}
+        {currentScreen === 'knowledge' && (
+          <KnowledgeScreen
+            cropGuides={cropGuides}
+            onSelectCropGuide={(guide) => setSelectedCropGuide(guide)}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        )}
+
+        {currentScreen === 'products' && (
+          <ProductsScreen
+            products={products}
+            onAddToCart={handleAddToCart}
+            onViewProduct={(p) => setSelectedProduct(p)}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
+        )}
+
+        {currentScreen === 'support' && (
+          <SupportScreen
+            faqs={FAQS}
+            onOpenLiveChat={() => setIsLiveChatOpen(true)}
+            onBookConsultation={handleBookConsultation}
+            onOpenApplicationGuides={() => setIsAppGuidesOpen(true)}
+            onOpenVideoTutorials={() => setIsVideoTutorialsOpen(true)}
+          />
+        )}
       </main>
 
       {/* Mobile Bottom Navigation */}
@@ -281,39 +384,35 @@ export default function App() {
           setCurrentScreen(s);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
-        cartItemsCount={totalCartCount}
-        user={currentUser}
-        onOpenLogin={() => setIsAuthModalOpen(true)}
-        onOpenAccount={() => setIsAccountModalOpen(true)}
       />
 
-      {/* Toast Notification Banner */}
-      {toastMessage && (
-        <div className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-50 bg-[#16241A] text-[#F1F5F2] px-4 py-2.5 rounded-xl shadow-xl flex items-center gap-2 text-xs font-bold animate-fade-in-up border-2 border-[#84CC16]">
-          <span className="material-symbols-outlined text-[#84CC16] text-[18px]">
-            check_circle
-          </span>
-          <span>{toastMessage}</span>
-        </div>
-      )}
-
-      {/* Modals & Slide-overs */}
+      {/* Modals & Drawers */}
       <CropGuideModal
-        guide={selectedCropGuide}
+        cropGuide={selectedCropGuide}
+        isOpen={Boolean(selectedCropGuide)}
         onClose={() => setSelectedCropGuide(null)}
-        onOrderRecommended={handleOrderSpecificProduct}
-        products={products}
+        onOrderFertilizer={(cropName) => {
+          setSelectedCropGuide(null);
+          handleOrderSpecificProduct(cropName);
+        }}
       />
 
       <ProductDetailsModal
         product={selectedProduct}
+        isOpen={Boolean(selectedProduct)}
         onClose={() => setSelectedProduct(null)}
         onAddToCart={(p, qty) => handleAddToCart(p, qty)}
       />
 
       <OrderDetailsModal
         order={selectedOrder}
+        isOpen={Boolean(selectedOrder)}
         onClose={() => setSelectedOrder(null)}
+        onReorder={(order) => {
+          order.items.forEach((item) => handleAddToCart(item.product, item.quantity));
+          setSelectedOrder(null);
+          setIsCartOpen(true);
+        }}
       />
 
       <CartDrawer
@@ -328,25 +427,30 @@ export default function App() {
       <LiveChatModal
         isOpen={isLiveChatOpen}
         onClose={() => setIsLiveChatOpen(false)}
-        onOrderProduct={handleOrderSpecificProduct}
+        onOrderRecommended={(pName) => {
+          setIsLiveChatOpen(false);
+          handleOrderSpecificProduct(pName);
+        }}
       />
 
       <LocationModal
         isOpen={isLocationModalOpen}
         onClose={() => setIsLocationModalOpen(false)}
+        locations={FARM_LOCATIONS}
         currentLocation={currentLocation}
         onSelectLocation={(loc) => {
           setCurrentLocation(loc);
-          showToast(`Switched farm site to ${loc.name}, ${loc.state}`);
+          showToast(`Location set to ${loc.name}, ${loc.state}`);
         }}
       />
 
       <CropCareModal
         isOpen={isCropCareModalOpen}
         onClose={() => setIsCropCareModalOpen(false)}
-        onOrderProduct={handleOrderSpecificProduct}
-        onOpenSoilScan={() => setIsSoilScanOpen(true)}
-        products={products}
+        onOrderProduct={(pName) => {
+          setIsCropCareModalOpen(false);
+          handleOrderSpecificProduct(pName);
+        }}
       />
 
       <SoilScanModal

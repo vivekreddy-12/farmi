@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserProfile, Order } from '../types';
 import { sounds } from '../utils/soundEffects';
 import { DEFAULT_RECEIPT_EMAIL, FORMATTED_DEFAULT_PHONE } from '../utils/receiptService';
+import { isSupabaseConfigured } from '../lib/supabase';
 
 interface UserAccountModalProps {
   isOpen: boolean;
@@ -79,6 +80,12 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 <span className="px-2 py-0.5 rounded bg-[#84CC16] text-[#0B110D] text-[9px] font-black uppercase tracking-wider">
                   Verified Farmer
                 </span>
+                {isSupabaseConfigured && (
+                  <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Cloud
+                  </span>
+                )}
               </div>
               <div className="text-xs text-[#84CC16] font-mono mt-0.5">{user.email}</div>
               <div className="text-[11px] text-[#9CAFA0] flex items-center gap-2 mt-0.5">
