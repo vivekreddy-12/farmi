@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { OrderItem, Order, PaymentMethodType, PaymentDetails } from '../types';
+import React, { useEffect, useState } from 'react';
+import { OrderItem, Order, PaymentMethodType, PaymentDetails, UserProfile } from '../types';
 import { PaymentMethodSelector } from './PaymentMethodSelector';
 import {
   DEFAULT_RECEIPT_PHONE,
@@ -30,6 +30,8 @@ interface CartDrawerProps {
   onUpdateQuantity: (productId: string, delta: number) => void;
   onRemoveItem: (productId: string) => void;
   onCheckoutComplete: (order: Order) => void;
+  /** The signed-in farmer; used to pre-fill delivery and receipt contacts. */
+  user?: UserProfile;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
@@ -39,11 +41,24 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onUpdateQuantity,
   onRemoveItem,
   onCheckoutComplete,
+  user,
 }) => {
   const [currentStep, setCurrentStep] = useState<'cart' | 'payment'>('cart');
-  const [deliveryAddress, setDeliveryAddress] = useState('Alex Miller - North Field Gate 2, Kansas City MO');
-  const [recipientPhone, setRecipientPhone] = useState(DEFAULT_RECEIPT_PHONE);
-  const [recipientEmail, setRecipientEmail] = useState(DEFAULT_RECEIPT_EMAIL);
+  const userAddress = user?.isLoggedIn
+    ? [user.name, user.farmName, user.location !== 'Select Location' ? user.location : ''].filter(Boolean).join(' - ')
+    : '';
+  const userPhoneDigits = (user?.phone || '').replace(/[^0-9]/g, '').slice(-10);
+  const [deliveryAddress, setDeliveryAddress] = useState(userAddress);
+  const [recipientPhone, setRecipientPhone] = useState(userPhoneDigits);
+  const [recipientEmail, setRecipientEmail] = useState(user?.email || '');
+
+  // The drawer stays mounted across sign-in/out, so re-fill when the farmer changes.
+  useEffect(() => {
+    setDeliveryAddress(userAddress);
+    setRecipientPhone(userPhoneDigits);
+    setRecipientEmail(user?.email || '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [newOrder, setNewOrder] = useState<Order | null>(null);
   const [smsNotificationToast, setSmsNotificationToast] = useState<string | null>(null);
@@ -179,7 +194,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       items: [...cartItems],
       destination: deliveryAddress,
       recipientPhone: targetPhone,
-      recipientEmail: DEFAULT_RECEIPT_EMAIL,
+      recipientEmail: recipientEmail.trim() || DEFAULT_RECEIPT_EMAIL,
       trackingNumber: `FM-TRK-${Math.floor(1000000 + Math.random() * 9000000)}`,
       estimatedDelivery: 'Arriving in 2 Business Days',
       paymentDetails: { ...paymentDetails },
@@ -345,7 +360,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   Order Confirmed & Receipt Sent!
                 </h3>
                 <p className="text-xs text-[#9CAFA0] max-w-xs mx-auto font-medium mt-1">
-                  Thank you, Alex. <strong>{newOrder.orderNumber}</strong> has been confirmed. Official tax receipt automatically dispatched to <strong>{newOrder.recipientEmail || DEFAULT_RECEIPT_EMAIL}</strong> & <strong>{newOrder.recipientPhone || FORMATTED_DEFAULT_PHONE}</strong>.
+                  Thank you{user?.isLoggedIn ? `, ${user.name.split(' ')[0]}` : ''}. <strong>{newOrder.orderNumber}</strong> has been confirmed. Official tax receipt automatically dispatched to <strong>{newOrder.recipientEmail || DEFAULT_RECEIPT_EMAIL}</strong> & <strong>{newOrder.recipientPhone || FORMATTED_DEFAULT_PHONE}</strong>.
                 </p>
               </div>
 

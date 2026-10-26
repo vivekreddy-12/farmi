@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserProfile, Order } from '../types';
 import { sounds } from '../utils/soundEffects';
-import { DEFAULT_RECEIPT_EMAIL, FORMATTED_DEFAULT_PHONE } from '../utils/receiptService';
 
 interface UserAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: UserProfile;
-  onUpdateUser: (updated: UserProfile) => void;
+  onUpdateUser: (updated: UserProfile) => void | Promise<void>;
   onLogout: () => void;
   orders: Order[];
   onOpenOrder: (order: Order) => void;
@@ -25,29 +24,38 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'receipts' | 'security'>('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user.name);
-  const [email, setEmail] = useState(user.email || DEFAULT_RECEIPT_EMAIL);
-  const [phone, setPhone] = useState(user.phone || FORMATTED_DEFAULT_PHONE);
-  const [farmName, setFarmName] = useState(user.farmName || 'Miller Organic Field Station');
-  const [location, setLocation] = useState(user.location || 'Kansas City, MO (Zone 6A)');
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [email, setEmail] = useState(user.email || '');
+  const [phone, setPhone] = useState(user.phone || '');
+  const [farmName, setFarmName] = useState(user.farmName || '');
+  const [location, setLocation] = useState(user.location === 'Select Location' ? '' : user.location || '');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // This modal stays mounted across sign-in/out, so reload the form whenever the farmer's saved profile changes.
+  useEffect(() => {
+    setName(user.name);
+    setEmail(user.email || '');
+    setPhone(user.phone || '');
+    setFarmName(user.farmName || '');
+    setLocation(user.location === 'Select Location' ? '' : user.location || '');
+  }, [user.id, user.name, user.email, user.phone, user.farmName, user.location]);
 
   if (!isOpen) return null;
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    sounds.playSuccess();
     const updated: UserProfile = {
       ...user,
-      name: name.trim(),
-      email: email.trim(),
+      name: name.trim() || user.name,
       phone: phone.trim(),
-      farmName: farmName.trim(),
-      location: location.trim(),
+      farmName: farmName.trim() || 'My Farmstead',
+      location: location.trim() || 'Select Location',
     };
-    onUpdateUser(updated);
+    setIsSaving(true);
+    // The app shows the success or failure message once the database has answered.
+    await onUpdateUser(updated);
+    setIsSaving(false);
+    sounds.playSuccess();
     setIsEditing(false);
-    setToastMessage('Grower profile updated successfully!');
-    setTimeout(() => setToastMessage(null), 3000);
   };
 
   return (
@@ -169,13 +177,6 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-5 overflow-y-auto space-y-4">
-          {toastMessage && (
-            <div className="p-3 bg-[#16241A] border-2 border-[#84CC16] rounded-xl text-[#84CC16] text-xs font-bold flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">verified</span>
-              <span>{toastMessage}</span>
-            </div>
-          )}
-
           {/* TAB 1: PROFILE */}
           {activeTab === 'profile' && (
             <div className="space-y-4">
@@ -267,9 +268,9 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                       <input
                         type="email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="w-full px-3 py-2 bg-[#0B110D] border-2 border-[#1E2E21] focus:border-[#84CC16] rounded-xl text-xs text-[#F1F5F2] outline-none font-mono"
+                        readOnly
+                        title="This is your sign-in email and can't be changed here"
+                        className="w-full px-3 py-2 bg-[#0B110D] border-2 border-[#1E2E21] rounded-xl text-xs text-[#9CAFA0] outline-none font-mono cursor-not-allowed"
                       />
                     </div>
                     <div>
@@ -322,9 +323,10 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                     </button>
                     <button
                       type="submit"
-                      className="w-1/2 py-2.5 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-bold text-xs rounded-xl"
+                      disabled={isSaving}
+                      className="w-1/2 py-2.5 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-bold text-xs rounded-xl disabled:opacity-60"
                     >
-                      Save Changes
+                      {isSaving ? 'Saving...' : 'Save Changes'}
                     </button>
                   </div>
                 </form>
@@ -441,8 +443,8 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
 
               <div className="p-3.5 bg-[#16241A] rounded-xl border border-[#1E2E21] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-[#F1F5F2]">Google Account Connection</div>
-                  <div className="text-[11px] text-[#84CC16] font-mono">njersey382@gmail.com</div>
+                  <div className="font-bold text-[#F1F5F2]">Signed-in Account</div>
+                  <div className="text-[11px] text-[#84CC16] font-mono">{user.email || user.phone}</div>
                 </div>
                 <span className="text-[10px] font-black uppercase text-[#84CC16] bg-[#0B110D] px-2 py-1 rounded border border-[#84CC16]/50">
                   Connected

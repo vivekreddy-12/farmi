@@ -4,7 +4,6 @@ import { ScreenType, CropGuide, Product, Order, OrderItem, FarmLocation, Consult
 import {
   INITIAL_PRODUCTS,
   CROP_GUIDES,
-  INITIAL_ORDERS,
   FARM_LOCATIONS,
   FAQS,
   GUEST_USER_PROFILE,
@@ -26,7 +25,20 @@ import { SearchModal } from './components/SearchModal';
 import { ApplicationGuidesModal } from './components/ApplicationGuidesModal';
 import { VideoTutorialsModal } from './components/VideoTutorialsModal';
 import { SoilScanModal } from './components/SoilScanModal';
-import { AuthModal } from './components/AuthModal';
+import { AuthModal, type AuthTab } from './components/AuthModal';
+import {
+  ensureProfile,
+  fetchOrders,
+  saveOrder,
+  updateProfile,
+} from './lib/farmerData';
+import {
+  getCurrentSession,
+  initAuth,
+  isBackendConfigured,
+  onAuthChange,
+  signOut,
+} from './lib/supabase';
 import { UserAccountModal } from './components/UserAccountModal';
 import { LoginScreen } from './components/LoginScreen';
 
@@ -35,41 +47,25 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // User Authentication State
-  const [currentUser, setCurrentUser] = useState<UserProfile>(() => {
-    try {
-      const saved = localStorage.getItem('farmin_user');
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch {
-      // Fallback
-    }
-    return GUEST_USER_PROFILE;
-  });
+  // User Authentication State. The signed-in farmer comes from the backend
+  // (Supabase Auth + the profiles table), never from browser storage.
+  const [currentUser, setCurrentUser] = useState<UserProfile>(GUEST_USER_PROFILE);
+  // True until we know whether a saved session exists, so a signed-in farmer
+  // never sees the login page flash up on reload.
+  const [authLoading, setAuthLoading] = useState<boolean>(isBackendConfigured);
+  const [authModalTab, setAuthModalTab] = useState<AuthTab>('google');
 
   // Whether the guest has chosen to browse without signing in
   const [guestBypass, setGuestBypass] = useState(false);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('farmin_user', JSON.stringify(currentUser));
-    } catch {
-      // Ignore
-    }
-  }, [currentUser]);
-
   // App State
   const [products] = useState<Product[]>(INITIAL_PRODUCTS);
   const [cropGuides] = useState<CropGuide[]>(CROP_GUIDES);
-  const [recentOrders, setRecentOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [currentLocation, setCurrentLocation] = useState<FarmLocation>(FARM_LOCATIONS[0]);
   
   // Cart State
-  const [cartItems, setCartItems] = useState<OrderItem[]>([
-    { product: INITIAL_PRODUCTS[0], quantity: 2 }, // 2 bags of Pro-Gro Nitrogen Plus
-    { product: INITIAL_PRODUCTS[1], quantity: 1 }, // 1 gal EcoBalance
-  ]);
+  const [cartItems, setCartItems] = useState<OrderItem[]>([]);
 
   // Modal / Drawer States
   const [selectedCropGuide, setSelectedCropGuide] = useState<CropGuide | null>(null);
@@ -95,21 +91,95 @@ export default function App() {
   };
 
   // Auth Handlers
-  const handleLoginSuccess = (user: UserProfile) => {
-    setCurrentUser(user);
-    showToast(`Welcome, ${user.name}! Connected as ${user.email}`);
+  const loadFarmerOrders = async () => {
+    try {
+      setRecentOrders(await fetchOrders());
+    } catch {
+      showToast('Could not load your saved orders. Pull to refresh or sign in again.');
+    }
   };
 
-  const handleUpdateUser = (updated: UserProfile) => {
-    setCurrentUser(updated);
-    showToast('Grower profile updated');
+  const handleLoginSuccess = (user: UserProfile) => {
+    setCurrentUser(user);
+    setGuestBypass(false);
+    showToast(`Welcome, ${user.name}!`);
+    void loadFarmerOrders();
+  };
+
+  const handleUpdateUser = async (updated: UserProfile) => {
+    const session = getCurrentSession();
+    if (!session) {
+      showToast('Please sign in to save your profile.');
+      return;
+    }
+    try {
+      const saved = await updateProfile(session.user, updated);
+      setCurrentUser(saved);
+      showToast('Grower profile saved');
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Could not save your profile. Please try again.');
+    }
+  };
+
+  const openLogin = () => {
+    setAuthModalTab('google');
+    setIsAuthModalOpen(true);
   };
 
   const handleLogout = () => {
+    void signOut();
     setCurrentUser(GUEST_USER_PROFILE);
+    setRecentOrders([]);
     setGuestBypass(false);
     showToast('Signed out. Switched to Guest Farmer mode.');
   };
+
+  // Restore the saved session on load, finish a Google / email-link sign-in,
+  // and drop back to guest mode if the session is revoked or expires for good.
+  useEffect(() => {
+    if (!isBackendConfigured) return;
+    let cancelled = false;
+
+    // The old demo build stored a fake profile here; remove it.
+    try {
+      localStorage.removeItem('farmin_user');
+    } catch {
+      // ignore
+    }
+
+    (async () => {
+      const callback = await initAuth();
+      if (callback.error && !cancelled) showToast(`Sign-in failed: ${callback.error}`);
+
+      const session = getCurrentSession();
+      if (session) {
+        try {
+          const profile = await ensureProfile(session.user);
+          if (cancelled) return;
+          setCurrentUser(profile);
+          if (callback.handledCallback) showToast(`Welcome, ${profile.name}!`);
+          setRecentOrders(await fetchOrders());
+        } catch {
+          if (!cancelled) showToast('Could not load your account. Please sign in again.');
+        }
+      }
+      if (!cancelled) setAuthLoading(false);
+    })();
+
+    const unsubscribe = onAuthChange((next) => {
+      if (!next) {
+        setCurrentUser(GUEST_USER_PROFILE);
+        setRecentOrders([]);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+    // showToast is stable enough for this one-time setup
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Cart Handlers
   const handleAddToCart = (product: Product, quantity = 1) => {
@@ -146,10 +216,20 @@ export default function App() {
     showToast('Item removed from cart');
   };
 
-  const handleCheckoutComplete = (newOrder: Order) => {
+  const handleCheckoutComplete = async (newOrder: Order) => {
     setRecentOrders((prev) => [newOrder, ...prev]);
     setCartItems([]);
-    showToast(`Order ${newOrder.orderNumber} placed! Receipt sent to ${currentUser.email || 'njersey382@gmail.com'}`);
+
+    if (!currentUser.isLoggedIn) {
+      showToast(`Order ${newOrder.orderNumber} placed. Sign in next time to keep your order history.`);
+      return;
+    }
+    try {
+      await saveOrder(newOrder);
+      showToast(`Order ${newOrder.orderNumber} placed and saved to your account.`);
+    } catch {
+      showToast(`Order ${newOrder.orderNumber} placed, but it could not be saved to your account. Please contact support.`);
+    }
   };
 
   const handleBookConsultation = (booking: Omit<ConsultationBooking, 'id' | 'status'>) => {
@@ -174,13 +254,32 @@ export default function App() {
 
   // Gate: unauthenticated visitors land on the dedicated login page first,
   // unless they explicitly choose to browse as a guest.
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-[#0B110D] text-[#9CAFA0] flex items-center justify-center text-sm" role="status">
+        Loading your farm...
+      </div>
+    );
+  }
+
   if (!currentUser.isLoggedIn && !guestBypass) {
     return (
-      <LoginScreen
-        onLoginSuccess={handleLoginSuccess}
-        onContinueAsGuest={() => setGuestBypass(true)}
-        defaultEmail="njersey382@gmail.com"
-      />
+      <>
+        <LoginScreen
+          onLoginSuccess={handleLoginSuccess}
+          onContinueAsGuest={() => setGuestBypass(true)}
+          onCreateAccount={() => {
+            setAuthModalTab('register');
+            setIsAuthModalOpen(true);
+          }}
+        />
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          onLoginSuccess={handleLoginSuccess}
+          initialTab={authModalTab}
+        />
+      </>
     );
   }
 
@@ -214,7 +313,7 @@ export default function App() {
           onOpenSoilScan={() => setIsSoilScanOpen(true)}
           cartItemsCount={totalCartCount}
           user={currentUser}
-          onOpenLogin={() => setIsAuthModalOpen(true)}
+          onOpenLogin={openLogin}
           onOpenAccount={() => setIsAccountModalOpen(true)}
         />
       </div>
@@ -239,7 +338,7 @@ export default function App() {
             window.scrollTo({ top: 400, behavior: 'smooth' });
           }}
           user={currentUser}
-          onOpenLogin={() => setIsAuthModalOpen(true)}
+          onOpenLogin={openLogin}
           onOpenAccount={() => setIsAccountModalOpen(true)}
         />
       )}
@@ -283,7 +382,7 @@ export default function App() {
         }}
         cartItemsCount={totalCartCount}
         user={currentUser}
-        onOpenLogin={() => setIsAuthModalOpen(true)}
+        onOpenLogin={openLogin}
         onOpenAccount={() => setIsAccountModalOpen(true)}
       />
 
@@ -323,6 +422,7 @@ export default function App() {
         onUpdateQuantity={handleUpdateCartQuantity}
         onRemoveItem={handleRemoveCartItem}
         onCheckoutComplete={handleCheckoutComplete}
+        user={currentUser}
       />
 
       <LiveChatModal
@@ -385,8 +485,7 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
-        defaultEmail="njersey382@gmail.com"
-        defaultPhone="9391216686"
+        initialTab={authModalTab}
       />
 
       {/* User Account / Profile Modal */}

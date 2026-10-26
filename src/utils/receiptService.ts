@@ -1,4 +1,5 @@
 import { Order, SmsReceiptInfo, EmailReceiptInfo } from '../types';
+import { getAccessToken } from '../lib/supabase';
 
 export const DEFAULT_RECEIPT_PHONE = '9391216686';
 export const FORMATTED_DEFAULT_PHONE = '+91 9391216686';
@@ -294,9 +295,12 @@ export function dispatchOrderReceiptEmail(order: Order, email: string = DEFAULT_
 export async function sendOrderReceiptToCreator(order: Order): Promise<boolean> {
   try {
     const email = order.recipientEmail || DEFAULT_RECEIPT_EMAIL;
+    // The endpoint only accepts signed-in farmers; guests have no token and are skipped.
+    const token = await getAccessToken();
+    if (!token) return false;
     const res = await fetch('/api/send-receipt', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
         subject: generateReceiptEmailSubject(order),
         html: generateReceiptEmailHtml(order, email),

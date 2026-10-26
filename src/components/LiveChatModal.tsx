@@ -19,7 +19,7 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
     {
       id: '1',
       sender: 'bot',
-      text: 'Hello Alex! I am Dr. Morgan, your FertilizerPro agronomy specialist. How can I help optimize your crop nutrition and soil yields today?',
+      text: 'Hello! I am Dr. Morgan, your FertilizerPro agronomy specialist. How can I help optimize your crop nutrition and soil yields today?',
       time: 'Just now',
     },
   ]);

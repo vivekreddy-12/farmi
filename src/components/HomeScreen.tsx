@@ -67,7 +67,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               className="hidden sm:flex items-center gap-1.5 text-xs text-[#84CC16] bg-[#16241A] px-2.5 py-1 rounded-lg border border-[#1E2E21] hover:border-[#84CC16] font-mono"
             >
               <span className="w-2 h-2 rounded-full bg-[#84CC16]" />
-              <span>{user?.email || 'njersey382@gmail.com'}</span>
+              <span>{user?.email || user?.phone}</span>
             </button>
           ) : (
             <button
@@ -107,7 +107,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 Sign in to your farmin Agro Account
               </div>
               <div className="text-[11px] text-[#9CAFA0] mt-0.5">
-                Automatically sync order invoices to <strong>njersey382@gmail.com</strong>, save GPS field zones, and claim grower subsidies.
+                Automatically sync order invoices to your email, save GPS field zones, and claim grower subsidies.
               </div>
             </div>
           </div>

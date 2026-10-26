@@ -1,130 +1,132 @@
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
 import { sounds } from '../utils/soundEffects';
+import { loginWithEmail, sendPasswordReset, sendPhoneOtp, verifyPhoneOtp } from '../lib/farmerData';
+import { startGoogleSignIn } from '../lib/supabase';
 
 interface LoginScreenProps {
   onLoginSuccess: (user: UserProfile) => void;
   onContinueAsGuest: () => void;
+  /** Opens the sign-up form. */
+  onCreateAccount: () => void;
   defaultEmail?: string;
 }
 
 type Mode = 'email' | 'phone';
 
-const AVATAR =
-  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=250';
-
 export const LoginScreen: React.FC<LoginScreenProps> = ({
   onLoginSuccess,
   onContinueAsGuest,
-  defaultEmail = 'njersey382@gmail.com',
+  onCreateAccount,
+  defaultEmail = '',
 }) => {
   const [mode, setMode] = useState<Mode>('email');
 
   // Email
   const [email, setEmail] = useState(defaultEmail);
-  const [password, setPassword] = useState('farmin2026@Agri');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
   // Phone
-  const [phone, setPhone] = useState('9391216686');
+  const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpCode, setOtpCode] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
-  const finish = (user: UserProfile, delay = 700) => {
+  const messageFrom = (err: unknown, fallback: string) =>
+    err instanceof Error && err.message ? err.message : fallback;
+
+  const handleGoogleLogin = async () => {
+    sounds.playClick();
     setIsLoading(true);
     setErrorMessage(null);
-    setTimeout(() => {
+    setInfoMessage(null);
+    try {
+      // Redirects the browser to Google; the page reloads signed in.
+      await startGoogleSignIn();
+    } catch (err) {
+      setErrorMessage(messageFrom(err, 'Could not start Google sign-in.'));
       setIsLoading(false);
-      sounds.playSuccess();
-      onLoginSuccess(user);
-    }, delay);
+    }
   };
 
-  const handleGoogleLogin = () => {
-    sounds.playClick();
-    finish(
-      {
-        id: 'usr-google-938210',
-        name: 'Alex Miller',
-        email: 'njersey382@gmail.com',
-        phone: '+91 9391216686',
-        farmName: 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: AVATAR,
-        isLoggedIn: true,
-        memberSince: 'March 2024',
-        kisanId: 'FARMIN-KISAN-9831',
-        role: 'Verified Google Account Grower',
-      },
-      800
-    );
-  };
-
-  const handleEmailLogin = (e: React.FormEvent) => {
+  const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) {
       setErrorMessage('Please enter both your email and password.');
       return;
     }
     sounds.playClick();
-    const nameFromEmail = email.split('@')[0];
-    const formattedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
-    finish({
-      id: `usr-email-${Math.floor(100000 + Math.random() * 900000)}`,
-      name: email.toLowerCase() === 'njersey382@gmail.com' ? 'Alex Miller' : formattedName,
-      email: email.trim(),
-      phone: '+91 9391216686',
-      farmName: 'Miller Organic Field Station',
-      location: 'Kansas City, MO (Zone 6A)',
-      avatar: AVATAR,
-      isLoggedIn: true,
-      memberSince: 'September 2026',
-      kisanId: 'FARMIN-KISAN-9831',
-      role: 'Commercial Grower',
-    });
+    setIsLoading(true);
+    setErrorMessage(null);
+    setInfoMessage(null);
+    try {
+      const user = await loginWithEmail(email, password);
+      sounds.playSuccess();
+      onLoginSuccess(user);
+    } catch (err) {
+      setErrorMessage(messageFrom(err, 'Could not sign in. Please try again.'));
+      setIsLoading(false);
+    }
   };
 
-  const handleSendOtp = () => {
-    if (!phone.trim()) {
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setErrorMessage('Enter your email above, then tap Forgot Password.');
+      return;
+    }
+    sounds.playClick();
+    setErrorMessage(null);
+    try {
+      await sendPasswordReset(email);
+      setInfoMessage('If an account exists for that email, a password reset link is on its way.');
+    } catch (err) {
+      setErrorMessage(messageFrom(err, 'Could not send the reset email.'));
+    }
+  };
+
+  const handleSendOtp = async () => {
+    if (phone.replace(/[^0-9]/g, '').length !== 10) {
       setErrorMessage('Please enter a valid 10-digit mobile number.');
       return;
     }
     sounds.playClick();
     setIsLoading(true);
     setErrorMessage(null);
-    setTimeout(() => {
-      setIsLoading(false);
+    setInfoMessage(null);
+    try {
+      await sendPhoneOtp(phone);
       setOtpSent(true);
-      setOtpCode('939121');
+      setOtpCode('');
       sounds.playDroplet();
-    }, 600);
+    } catch (err) {
+      setErrorMessage(messageFrom(err, 'Could not send the verification code.'));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handlePhoneVerify = (e: React.FormEvent) => {
+  const handlePhoneVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otpCode || otpCode.length < 4) {
       setErrorMessage('Please enter the verification code sent to your phone.');
       return;
     }
     sounds.playClick();
-    const cleanPhone = phone.replace(/[^0-9]/g, '');
-    finish({
-      id: `usr-phone-${Math.floor(100000 + Math.random() * 900000)}`,
-      name: 'Alex Miller',
-      email: 'njersey382@gmail.com',
-      phone: `+91 ${cleanPhone.slice(-10)}`,
-      farmName: 'Miller Organic Field Station',
-      location: 'Kansas City, MO (Zone 6A)',
-      avatar: AVATAR,
-      isLoggedIn: true,
-      memberSince: 'September 2026',
-      kisanId: 'FARMIN-OTP-9391',
-      role: 'Verified Mobile Grower',
-    });
+    setIsLoading(true);
+    setErrorMessage(null);
+    try {
+      const user = await verifyPhoneOtp(phone, otpCode);
+      sounds.playSuccess();
+      onLoginSuccess(user);
+    } catch (err) {
+      setErrorMessage(messageFrom(err, 'That code did not work. Please try again.'));
+      setIsLoading(false);
+    }
   };
 
   const inputClass =
@@ -206,6 +208,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           </div>
         )}
 
+        {infoMessage && (
+          <div className="p-3 bg-[#16241A] border border-[#84CC16]/50 rounded-xl text-[#C9E8A0] text-xs flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#84CC16] text-[18px]">mark_email_read</span>
+            <span>{infoMessage}</span>
+          </div>
+        )}
+
         {/* EMAIL MODE */}
         {mode === 'email' && (
           <form onSubmit={handleEmailLogin} className="flex flex-col gap-3.5">
@@ -222,7 +231,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="e.g. njersey382@gmail.com"
+                  placeholder="you@example.com"
                   className={inputClass}
                 />
               </div>
@@ -233,17 +242,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#9CAFA0]">
                   Password
                 </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    sounds.playClick();
-                    setEmail('njersey382@gmail.com');
-                    setPassword('farmin2026@Agri');
-                  }}
-                  className="text-[10px] text-[#84CC16] hover:underline font-bold"
-                >
-                  Use Demo Password
-                </button>
               </div>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
@@ -282,7 +280,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               </label>
               <button
                 type="button"
-                onClick={() => alert('Password reset link has been dispatched to njersey382@gmail.com')}
+                onClick={handleForgotPassword}
                 className="text-[#84CC16] hover:underline text-[11px] font-semibold"
               >
                 Forgot Password?
@@ -363,7 +361,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     />
                   </div>
                   <p className="text-[10px] text-[#84CC16] mt-1.5">
-                    Demo code auto-filled. Sent to +91 {phone.slice(-10)}.
+                    Code sent to +91 {phone.replace(/[^0-9]/g, '').slice(-10)}.
                   </p>
                 </div>
 
@@ -410,6 +408,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
           </svg>
           <span>Continue with Google</span>
+        </button>
+
+        {/* Create account */}
+        <button
+          type="button"
+          onClick={() => {
+            sounds.playClick();
+            onCreateAccount();
+          }}
+          className="w-full py-3 bg-[#16241A] hover:bg-[#1E2E21] text-[#84CC16] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-[#1E2E21]"
+        >
+          <span className="material-symbols-outlined text-[18px]">person_add</span>
+          New here? Create a Farmer Account
         </button>
 
         {/* Guest */}
