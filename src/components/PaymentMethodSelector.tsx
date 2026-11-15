@@ -305,11 +305,11 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <label className="text-[11px] font-['Space_Grotesk',sans-serif] font-black text-[#84CC16] uppercase tracking-wider flex items-center gap-1.5">
-          <span className="material-symbols-outlined text-[16px]">payments</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">payments</span>
           Select Payment Method
         </label>
         <span className="text-[10px] text-[#9CAFA0] font-mono flex items-center gap-1">
-          <span className="material-symbols-outlined text-[#84CC16] text-[13px]">lock</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[13px]">lock</span>
           256-Bit SSL Encrypted
         </span>
       </div>
@@ -341,7 +341,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                         : 'bg-[#16241A] text-[#9CAFA0] border-[#1E2E21]'
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[20px] font-bold">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[20px] font-bold">
                       {method.icon}
                     </span>
                   </div>
@@ -471,7 +471,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                               onClick={() => handleLaunchApp(selectedUpiApp)}
                               className="w-full py-3 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm border border-[#84CC16]"
                             >
-                              <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">open_in_new</span>
                               <span>Open {selectedUpiApp} & Pay ₹{totalAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
                             </button>
                           </div>
@@ -518,7 +518,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                               onClick={() => handleLaunchApp('UPI')}
                               className="flex-grow py-2.5 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-all active:scale-95 flex items-center justify-center gap-1.5"
                             >
-                              <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">open_in_new</span>
                               <span>Open in UPI Payment App</span>
                             </button>
                           </div>
@@ -526,7 +526,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                           {isUpiVerified && (
                             <div className="p-2 bg-[#16241A] rounded border border-[#84CC16]/40 flex items-center justify-between text-[11px]">
                               <span className="text-[#84CC16] font-medium flex items-center gap-1">
-                                <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                                <span aria-hidden="true" className="material-symbols-outlined text-[14px]">check_circle</span>
                                 Target UPI ID: <strong className="font-mono">{upiId}</strong> (YES Bank / PhonePe)
                               </span>
                               <button
@@ -597,7 +597,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                             onClick={() => handleLaunchApp('UPI')}
                             className="w-full py-2.5 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-all active:scale-95 flex items-center justify-center gap-1.5"
                           >
-                            <span className="material-symbols-outlined text-[16px]">phone_android</span>
+                            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">phone_android</span>
                             <span>Open Payment App on This Device</span>
                           </button>
                         </div>
@@ -606,7 +606,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                       {/* App Launch Toast Notification */}
                       {appLaunchToast && (
                         <div className="p-3 bg-[#84CC16]/15 border border-[#84CC16] rounded-xl flex items-center gap-2.5 text-xs text-[#F1F5F2] animate-fade-in">
-                          <span className="material-symbols-outlined text-[#84CC16] text-[20px] shrink-0 animate-spin">
+                          <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px] shrink-0 animate-spin">
                             sync
                           </span>
                           <div className="flex-grow">
@@ -759,7 +759,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                   {method.id === 'kcc' && (
                     <div className="space-y-3">
                       <div className="p-3 bg-[#84CC16]/10 border border-[#84CC16]/40 rounded-xl flex items-start gap-2.5">
-                        <span className="material-symbols-outlined text-[#84CC16] text-[20px] shrink-0">
+                        <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px] shrink-0">
                           verified
                         </span>
                         <div>
@@ -901,7 +901,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                             }`}
                           >
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="material-symbols-outlined text-[16px] text-[#84CC16]">
+                              <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">
                                 {w.icon}
                               </span>
                               <span className="font-['Space_Grotesk',sans-serif] font-bold text-xs text-[#F1F5F2]">
@@ -1049,7 +1049,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="material-symbols-outlined text-[#84CC16] text-[18px]">
+                            <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[18px]">
                               payments
                             </span>
                             <span className="font-['Space_Grotesk',sans-serif] font-bold text-xs text-[#F1F5F2]">
@@ -1074,7 +1074,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                           }`}
                         >
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="material-symbols-outlined text-[#84CC16] text-[18px]">
+                            <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[18px]">
                               point_of_sale
                             </span>
                             <span className="font-['Space_Grotesk',sans-serif] font-bold text-xs text-[#F1F5F2]">
@@ -1088,7 +1088,7 @@ export const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
                       </div>
 
                       <div className="p-2.5 bg-[#16241A] rounded-lg border border-[#1E2E21] flex items-center gap-2 text-[11px] text-[#9CAFA0]">
-                        <span className="material-symbols-outlined text-[#84CC16] text-[16px]">
+                        <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[16px]">
                           sms
                         </span>
                         <span>A delivery confirmation OTP code will be sent to your registered phone number.</span>

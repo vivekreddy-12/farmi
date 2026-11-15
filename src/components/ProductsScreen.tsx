@@ -56,7 +56,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
       <div className="bg-[#111A13]/90 backdrop-blur-sm p-6 sm:p-8 rounded-xl border-2 border-[#1E2E21] shadow-sm relative overflow-hidden">
         <div 
           className="absolute inset-0 pointer-events-none opacity-10 bg-cover bg-center mix-blend-screen"
-          style={{ backgroundImage: `url('/src/assets/images/dark_farm_field_1788272012797.jpg')` }}
+          style={{ backgroundImage: `url('/images/dark_farm_field_1788272012797.jpg')` }}
         />
 
         <div className="relative z-10">
@@ -75,7 +75,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#84CC16] fill-icon text-[20px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] fill-icon text-[20px]">
                     calculate
                   </span>
                   <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
@@ -128,11 +128,11 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-grow">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#84CC16] text-[22px]">
+            <span aria-hidden="true" className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#84CC16] text-[22px]">
               search
             </span>
             <input
-              className="w-full h-12 pl-12 pr-10 rounded-lg bg-[#111A13] border-2 border-[#1E2E21] font-['Plus_Jakarta_Sans',sans-serif] text-sm font-bold text-[#F1F5F2] transition-all placeholder:text-[#6B7F6E] outline-none shadow-sm focus:border-[#84CC16]"
+              className="w-full h-12 pl-12 pr-10 rounded-lg bg-[#111A13] border-2 border-[#1E2E21] font-['Plus_Jakarta_Sans',sans-serif] text-sm font-bold text-[#F1F5F2] transition-all placeholder:text-[#9CAFA0] outline-none shadow-sm focus:border-[#84CC16]"
               placeholder="Search by fertilizer name, NPK ratio, formulation..."
               type="text"
               value={searchQuery}
@@ -143,7 +143,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
                 onClick={() => onSearchChange('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] hover:text-[#84CC16] p-1.5"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
           </div>
@@ -170,7 +170,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
       {/* Products Grid */}
       {filteredProducts.length === 0 ? (
         <div className="bg-[#111A13] rounded-xl p-12 text-center border-2 border-[#1E2E21] max-w-lg mx-auto shadow-sm">
-          <span className="material-symbols-outlined text-5xl text-[#84CC16] mb-3">
+          <span aria-hidden="true" className="material-symbols-outlined text-5xl text-[#84CC16] mb-3">
             inventory_2
           </span>
           <h3 className="font-['Space_Grotesk',sans-serif] text-xl font-extrabold text-[#F1F5F2] mb-1">
@@ -208,7 +208,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
                 }}
                 data-cursor-label="VIEW"
               >
-                <img
+                <img loading="lazy" decoding="async"
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   src={product.image}
@@ -232,7 +232,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
                     {product.formulation}
                   </span>
                   <div className="flex items-center text-xs text-[#9CAFA0]">
-                    <span className="material-symbols-outlined text-[#FACC15] fill text-[16px] mr-1">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[#FACC15] fill text-[16px] mr-1">
                       star
                     </span>
                     <span className="font-['Space_Grotesk',sans-serif] font-bold text-[#F1F5F2]">{product.rating}</span>
@@ -256,7 +256,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
                 </p>
 
                 <div className="bg-[#16241A] p-2.5 rounded-lg mb-4 text-[11px] text-[#9CAFA0] flex items-center gap-1.5 border border-[#1E2E21]">
-                  <span className="material-symbols-outlined text-[#84CC16] text-[16px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[16px]">
                     grass
                   </span>
                   <span className="line-clamp-1 font-bold text-[#F1F5F2]">{product.coveragePerBag}</span>
@@ -282,7 +282,7 @@ export const ProductsScreen: React.FC<ProductsScreenProps> = ({
                         : 'bg-[#84CC16] text-[#0B110D] hover:bg-[#99E321]'
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[16px] font-bold">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">
                       {justAddedId === product.id ? 'check' : 'shopping_cart'}
                     </span>
                     {justAddedId === product.id ? 'Added!' : 'Add to Cart'}

@@ -19,7 +19,7 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
     {
       id: '1',
       sender: 'bot',
-      text: 'Hello Alex! I am Dr. Morgan, your FertilizerPro agronomy specialist. How can I help optimize your crop nutrition and soil yields today?',
+      text: 'Hello! I am your farmin agronomy assistant. How can I help optimize your crop nutrition and soil yields today?',
       time: 'Just now',
     },
   ]);
@@ -89,9 +89,9 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
         <div className="p-4 bg-[#16241A] text-[#F1F5F2] flex justify-between items-center shrink-0 border-b-2 border-[#1E2E21]">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <img
+              <img loading="lazy" decoding="async"
                 src={SUPPORT_AVATAR}
-                alt="Dr. Morgan"
+                alt="farmin agronomy assistant"
                 className="w-10 h-10 rounded-full object-cover border-2 border-[#84CC16]"
               />
               <span className="absolute bottom-0 right-0 w-3 h-3 bg-[#84CC16] border-2 border-[#111A13] rounded-full" />
@@ -110,7 +110,7 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
@@ -172,7 +172,7 @@ export const LiveChatModal: React.FC<LiveChatModalProps> = ({ isOpen, onClose })
             disabled={!inputText.trim()}
             className="bg-[#84CC16] text-[#0B110D] disabled:opacity-50 p-2.5 rounded-xl hover:bg-[#99E321] transition-colors active:scale-95 shrink-0 border-2 border-[#84CC16]"
           >
-            <span className="material-symbols-outlined text-[20px] block font-bold">send</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] block font-bold">send</span>
           </button>
         </div>
       </div>

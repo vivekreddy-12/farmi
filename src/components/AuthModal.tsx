@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { validateEmail, validatePhone, validatePassword, validateName, validateOtp, looksLikeBot } from '../utils/validation';
+import React, { useRef, useState } from 'react';
 import { UserProfile } from '../types';
 import { sounds } from '../utils/soundEffects';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -28,14 +29,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   onLoginSuccess,
-  defaultEmail = 'njersey382@gmail.com',
-  defaultPhone = '9391216686',
+  defaultEmail = '',
+  defaultPhone = '',
 }) => {
   const [activeTab, setActiveTab] = useState<AuthTab>('email');
+  const [honeypot, setHoneypot] = useState('');
+  const openedAt = useRef(Date.now());
 
   // Email state
   const [email, setEmail] = useState(defaultEmail);
-  const [password, setPassword] = useState('farmin2026@Agri');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   // Phone state
@@ -44,9 +47,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [otpCode, setOtpCode] = useState('');
 
   // Register state
-  const [regName, setRegName] = useState('Alex Miller');
+  const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState(defaultEmail);
-  const [regPassword, setRegPassword] = useState('farmin2026@Agri');
+  const [regPassword, setRegPassword] = useState('');
   const [regPhone, setRegPhone] = useState(defaultPhone);
   const [regFarmName, setRegFarmName] = useState('Miller Organic Field Station');
   const [regCropType, setRegCropType] = useState('Corn & Soybeans');
@@ -73,31 +76,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      const user: UserProfile = {
-        id: 'usr-google-938210',
-        name: 'Alex Miller',
-        email: 'njersey382@gmail.com',
-        phone: '+91 9391216686',
-        farmName: 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: DEFAULT_AVATAR,
-        isLoggedIn: true,
-        memberSince: 'March 2024',
-        kisanId: 'FARMIN-KISAN-9831',
-        role: 'Verified Google Account Grower',
-      };
-      onLoginSuccess(user);
-      onClose();
-    }, 800);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      setErrorMessage('Please enter both your email and password.');
+    const loginErr = validateEmail(email) || (password ? '' : 'Enter your password.');
+    if (loginErr) {
+      setErrorMessage(loginErr);
       return;
     }
 
@@ -140,33 +127,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      const nameFromEmail = email.split('@')[0];
-      const formattedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
-
-      const user: UserProfile = {
-        id: `usr-email-${Math.floor(100000 + Math.random() * 900000)}`,
-        name: email.toLowerCase() === 'njersey382@gmail.com' ? 'Alex Miller' : formattedName,
-        email: email.trim(),
-        phone: '+91 9391216686',
-        farmName: 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: DEFAULT_AVATAR,
-        isLoggedIn: true,
-        memberSince: 'September 2026',
-        kisanId: 'FARMIN-KISAN-9831',
-        role: 'Commercial Grower',
-      };
-      onLoginSuccess(user);
-      onClose();
-    }, 700);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   const handleSendOtp = async () => {
-    if (!phone.trim()) {
-      setErrorMessage('Please enter a valid 10-digit mobile number.');
+    const phoneErr = validatePhone(phone);
+    if (phoneErr) {
+      setErrorMessage(phoneErr);
       return;
     }
     sounds.playClick();
@@ -187,18 +155,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
-      setOtpSent(true);
-      setOtpCode('939121');
-      sounds.playDroplet();
-    }, 600);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   const handlePhoneVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otpCode || otpCode.length < 4) {
-      setErrorMessage('Please enter the verification code sent to your phone.');
+    if (validateOtp(otpCode)) {
+      setErrorMessage('Enter the 6-digit code sent to your phone.');
       return;
     }
 
@@ -240,32 +204,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      const cleanPhone = phone.replace(/[^0-9]/g, '');
-      const user: UserProfile = {
-        id: `usr-phone-${Math.floor(100000 + Math.random() * 900000)}`,
-        name: 'Alex Miller',
-        email: 'njersey382@gmail.com',
-        phone: `+91 ${cleanPhone.slice(-10)}`,
-        farmName: 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: DEFAULT_AVATAR,
-        isLoggedIn: true,
-        memberSince: 'September 2026',
-        kisanId: 'FARMIN-OTP-9391',
-        role: 'Verified Mobile Grower',
-      };
-      onLoginSuccess(user);
-      onClose();
-    }, 700);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!regName.trim() || !regEmail.trim() || !regPassword) {
-      setErrorMessage('Please provide your name, email, and a password.');
+    const regErr =
+      validateName(regName) ||
+      validateEmail(regEmail) ||
+      validatePassword(regPassword) ||
+      (regPhone.trim() ? validatePhone(regPhone) : '');
+    if (regErr) {
+      setErrorMessage(regErr);
+      return;
+    }
+    if (looksLikeBot(honeypot, openedAt.current)) {
+      setErrorMessage('Please wait a moment and try again.');
       return;
     }
 
@@ -288,9 +243,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             id: res.user.id,
             name: regName.trim(),
             email: regEmail.trim(),
-            phone: regPhone ? `+91 ${regPhone.replace(/[^0-9]/g, '').slice(-10)}` : '+91 9391216686',
+            phone: regPhone ? `+91 ${regPhone.replace(/[^0-9]/g, '').slice(-10)}` : '',
             farmName: regFarmName.trim() || 'My Farmstead',
-            location: 'Kansas City, MO (Zone 6A)',
+            location: 'Select Location',
             avatar: DEFAULT_AVATAR,
             isLoggedIn: true,
             memberSince: 'October 2026',
@@ -310,25 +265,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       return;
     }
 
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      const user: UserProfile = {
-        id: `usr-reg-${Math.floor(100000 + Math.random() * 900000)}`,
-        name: regName.trim(),
-        email: regEmail.trim(),
-        phone: regPhone ? `+91 ${regPhone.replace(/[^0-9]/g, '').slice(-10)}` : '+91 9391216686',
-        farmName: regFarmName.trim() || 'My Farmstead',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: DEFAULT_AVATAR,
-        isLoggedIn: true,
-        memberSince: 'October 2026',
-        kisanId: `FARMIN-${Math.floor(1000 + Math.random() * 9000)}`,
-        role: `Grower (${regCropType})`,
-      };
-      onLoginSuccess(user);
-      onClose();
-    }, 800);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   return (
@@ -338,7 +276,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         <div className="p-5 border-b-2 border-[#1E2E21] bg-[#16241A] flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#0B110D] border-2 border-[#84CC16] flex items-center justify-center text-[#84CC16]">
-              <span className="material-symbols-outlined text-[22px]">account_circle</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[22px]">account_circle</span>
             </div>
             <div>
               <h2 className="text-base font-['Space_Grotesk',sans-serif] font-black uppercase text-[#F1F5F2] tracking-wide">
@@ -358,7 +296,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             }}
             className="w-8 h-8 rounded-lg bg-[#0B110D] text-[#9CAFA0] hover:text-[#F1F5F2] hover:bg-[#1E2E21] flex items-center justify-center transition-colors border border-[#1E2E21]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
@@ -373,12 +311,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               Real Cloud Sync
             </span>
           </div>
-        ) : (
-          <div className="px-4 py-1.5 bg-amber-500/10 border-b border-amber-500/20 text-[10px] text-amber-300 flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-[14px]">info</span>
-            <span>Demo Mode active. Connect Supabase keys in Vercel to save data in cloud.</span>
-          </div>
-        )}
+        ) : null}
 
         {/* Tab Buttons */}
         <div className="p-3 bg-[#0B110D] border-b border-[#1E2E21] grid grid-cols-4 gap-1.5 text-xs">
@@ -395,7 +328,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 : 'text-[#9CAFA0] hover:text-[#F1F5F2] hover:bg-[#16241A]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">mail</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">mail</span>
             <span className="text-[10px] uppercase tracking-wider font-extrabold">Email</span>
           </button>
 
@@ -412,7 +345,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 : 'text-[#9CAFA0] hover:text-[#F1F5F2] hover:bg-[#16241A]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">person_add</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">person_add</span>
             <span className="text-[10px] uppercase tracking-wider font-extrabold">Sign Up</span>
           </button>
 
@@ -429,7 +362,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 : 'text-[#9CAFA0] hover:text-[#F1F5F2] hover:bg-[#16241A]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">smartphone</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">smartphone</span>
             <span className="text-[10px] uppercase tracking-wider font-extrabold">Phone</span>
           </button>
 
@@ -446,23 +379,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 : 'text-[#9CAFA0] hover:text-[#F1F5F2] hover:bg-[#16241A]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">g_mobiledata</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">g_mobiledata</span>
             <span className="text-[10px] uppercase tracking-wider font-extrabold">Google</span>
           </button>
         </div>
 
         {/* Content Area */}
         <div className="p-5 overflow-y-auto space-y-4">
+          <p className="text-[11px] text-[#9CAFA0] text-center">
+            By continuing you agree to our{' '}
+            <a href="/terms" target="_blank" rel="noopener" className="text-[#84CC16] underline">Terms</a> and{' '}
+            <a href="/privacy" target="_blank" rel="noopener" className="text-[#84CC16] underline">Privacy Policy</a>.
+          </p>
           {errorMessage && (
-            <div className="p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-300 text-xs flex items-center gap-2 animate-shake">
-              <span className="material-symbols-outlined text-red-400 text-[18px]">error</span>
+            <div role="alert" className="p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-300 text-xs flex items-center gap-2 animate-shake">
+              <span aria-hidden="true" className="material-symbols-outlined text-red-400 text-[18px]">error</span>
               <span>{errorMessage}</span>
             </div>
           )}
 
           {infoMessage && (
             <div className="p-3 bg-[#84CC16]/10 border border-[#84CC16]/40 rounded-xl text-[#84CC16] text-xs flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">info</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">info</span>
               <span>{infoMessage}</span>
             </div>
           )}
@@ -508,12 +446,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               >
                 {isLoading ? (
                   <>
-                    <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                     <span>Connecting to Google...</span>
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px]">login</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px]">login</span>
                     <span>Sign In with Google</span>
                   </>
                 )}
@@ -523,13 +461,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* TAB 2: EMAIL */}
           {activeTab === 'email' && (
-            <form onSubmit={handleEmailLogin} className="space-y-3.5">
+            <form onSubmit={handleEmailLogin} className="space-y-3.5" noValidate>
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#9CAFA0] mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                  <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                     mail
                   </span>
                   <input
@@ -548,20 +486,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <label className="block text-[11px] font-bold uppercase tracking-wider text-[#9CAFA0]">
                     Password
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sounds.playClick();
-                      setEmail('njersey382@gmail.com');
-                      setPassword('farmin2026@Agri');
-                    }}
-                    className="text-[10px] text-[#84CC16] hover:underline font-bold"
-                  >
-                    Use Demo Password
-                  </button>
                 </div>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                  <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                     lock
                   </span>
                   <input
@@ -577,12 +504,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] hover:text-[#F1F5F2]"
                   >
-                    <span className="material-symbols-outlined text-[16px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                       {showPassword ? 'visibility_off' : 'visibility'}
                     </span>
                   </button>
                 </div>
               </div>
+
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-0 w-0 opacity-0"
+              />
 
               <button
                 type="submit"
@@ -591,12 +529,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               >
                 {isLoading ? (
                   <>
-                    <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                     <span>Authenticating...</span>
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px] font-bold">login</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">login</span>
                     <span>Sign In with Email</span>
                   </>
                 )}
@@ -636,12 +574,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   >
                     {isLoading ? (
                       <>
-                        <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                         <span>Sending SMS OTP...</span>
                       </>
                     ) : (
                       <>
-                        <span className="material-symbols-outlined text-[18px] font-bold">sms</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">sms</span>
                         <span>Send 6-Digit OTP</span>
                       </>
                     )}
@@ -684,12 +622,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   >
                     {isLoading ? (
                       <>
-                        <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                         <span>Verifying OTP...</span>
                       </>
                     ) : (
                       <>
-                        <span className="material-symbols-outlined text-[18px] font-bold">verified_user</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">verified_user</span>
                         <span>Verify &amp; Sign In</span>
                       </>
                     )}
@@ -701,7 +639,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
           {/* TAB 4: REGISTER NEW FARMER */}
           {activeTab === 'register' && (
-            <form onSubmit={handleRegister} className="space-y-3">
+            <form onSubmit={handleRegister} className="space-y-3" noValidate>
               <div>
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#9CAFA0] mb-1">
                   Full Name / Lead Farmer
@@ -797,12 +735,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               >
                 {isLoading ? (
                   <>
-                    <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                     <span>Creating Account &amp; Syncing Profile...</span>
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-[18px] font-bold">how_to_reg</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">how_to_reg</span>
                     <span>Register &amp; Save Profile to Cloud</span>
                   </>
                 )}

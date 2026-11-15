@@ -41,7 +41,7 @@ export const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({
         {/* Farm Photo Ambient Background Watermark */}
         <div 
           className="absolute inset-0 pointer-events-none opacity-10 bg-cover bg-center mix-blend-screen"
-          style={{ backgroundImage: `url('/src/assets/images/dark_farm_field_1788272012797.jpg')` }}
+          style={{ backgroundImage: `url('/images/dark_farm_field_1788272012797.jpg')` }}
         />
 
         <div className="relative z-10">
@@ -59,11 +59,11 @@ export const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({
         {/* Search & Filter */}
         <div className="relative z-10 flex flex-col md:flex-row gap-3 mt-6 pt-6 border-t border-[#1E2E21]">
           <div className="relative flex-grow">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#84CC16] text-[22px]">
+            <span aria-hidden="true" className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-[#84CC16] text-[22px]">
               search
             </span>
             <input
-              className="w-full h-12 pl-12 pr-10 rounded-lg bg-[#16241A] border-2 border-[#1E2E21] focus:bg-[#111A13] focus:border-[#84CC16] font-['Plus_Jakarta_Sans',sans-serif] text-sm text-[#F1F5F2] transition-all placeholder:text-[#6B7F6E] outline-none font-bold"
+              className="w-full h-12 pl-12 pr-10 rounded-lg bg-[#16241A] border-2 border-[#1E2E21] focus:bg-[#111A13] focus:border-[#84CC16] font-['Plus_Jakarta_Sans',sans-serif] text-sm text-[#F1F5F2] transition-all placeholder:text-[#9CAFA0] outline-none font-bold"
               placeholder="Search crops, fertilizers, NPK formulas..."
               type="text"
               value={searchQuery}
@@ -74,7 +74,7 @@ export const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({
                 onClick={() => onSearchChange('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] hover:text-[#84CC16] p-1.5"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
               </button>
             )}
           </div>
@@ -100,7 +100,7 @@ export const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({
       {/* Content Grid (Bento style) */}
       {filteredGuides.length === 0 ? (
         <div className="bg-[#111A13] rounded-xl p-12 text-center border-2 border-[#1E2E21] max-w-lg mx-auto shadow-sm">
-          <span className="material-symbols-outlined text-5xl text-[#84CC16] mb-3">
+          <span aria-hidden="true" className="material-symbols-outlined text-5xl text-[#84CC16] mb-3">
             search_off
           </span>
           <h3 className="font-['Space_Grotesk',sans-serif] text-xl font-extrabold text-[#F1F5F2] mb-1">
@@ -128,7 +128,7 @@ export const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({
             >
               {/* Image with animated tags */}
               <div className="h-48 w-full relative overflow-hidden bg-[#16241A]">
-                <img
+                <img loading="lazy" decoding="async"
                   className={`w-full h-full object-cover ${
                     crop.id === 'crop-rice'
                       ? 'animate-wind-sway'
@@ -156,20 +156,20 @@ export const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({
                 {/* Recommended box */}
                 <div className="bg-[#16241A] p-4 rounded-lg mb-5 flex-grow border border-[#1E2E21]">
                   <h3 className="font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider text-[#84CC16] mb-2 flex items-center gap-1.5">
-                    <span className="material-symbols-outlined text-[#84CC16] text-[18px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[18px]">
                       {crop.recommendedIcon}
                     </span>
                     {crop.recommendedHeader}
                   </h3>
                   <ul className="font-['Plus_Jakarta_Sans',sans-serif] text-xs text-[#9CAFA0] space-y-2">
                     <li className="flex items-start gap-2">
-                      <span className="material-symbols-outlined text-[#84CC16] text-[16px] mt-0.5 shrink-0 font-black">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[16px] mt-0.5 shrink-0 font-black">
                         check_circle
                       </span>
                       <span className="leading-snug text-[#F1F5F2]">{crop.basal}</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="material-symbols-outlined text-[#84CC16] text-[16px] mt-0.5 shrink-0 font-black">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[16px] mt-0.5 shrink-0 font-black">
                         check_circle
                       </span>
                       <span className="leading-snug text-[#F1F5F2]">{crop.topDressing}</span>

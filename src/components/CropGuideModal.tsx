@@ -29,7 +29,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
       <div className="bg-[#111A13] rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl border-2 border-[#1E2E21] overflow-hidden text-[#F1F5F2]">
         {/* Modal Header */}
         <div className="relative h-44 sm:h-52 bg-[#16241A] overflow-hidden shrink-0 border-b-2 border-[#1E2E21]">
-          <img
+          <img loading="lazy" decoding="async"
             src={guide.image}
             alt={guide.name}
             className="w-full h-full object-cover"
@@ -41,7 +41,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
             aria-label="Close Guide"
             className="absolute top-4 right-4 bg-[#111A13]/80 hover:bg-[#111A13] text-[#F1F5F2] p-2 rounded-full backdrop-blur-xs transition-colors z-10 border border-[#1E2E21]"
           >
-            <span className="material-symbols-outlined text-[20px] block">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] block">close</span>
           </button>
 
           <div className="absolute bottom-4 left-5 right-5 text-[#F1F5F2]">
@@ -67,7 +67,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">timeline</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">timeline</span>
             Timeline & Plan
           </button>
 
@@ -79,7 +79,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">calculate</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">calculate</span>
             Dosage Calculator
           </button>
 
@@ -91,7 +91,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">warning</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">warning</span>
             Deficiencies
           </button>
         </div>
@@ -102,7 +102,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
             <div className="space-y-4">
               <div className="bg-[#16241A] p-4 rounded-xl border-2 border-[#1E2E21]">
                 <h3 className="text-xs font-['Space_Grotesk',sans-serif] font-black uppercase tracking-wider text-[#84CC16] flex items-center gap-2 mb-1">
-                  <span className="material-symbols-outlined text-[#84CC16] text-[20px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">
                     {guide.recommendedIcon}
                   </span>
                   {guide.recommendedHeader}
@@ -145,7 +145,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
             <div className="space-y-4">
               <div className="bg-[#16241A] p-4 rounded-xl border-2 border-[#1E2E21] text-[#F1F5F2]">
                 <h4 className="font-['Space_Grotesk',sans-serif] font-extrabold text-sm mb-1 flex items-center gap-1.5 text-[#84CC16]">
-                  <span className="material-symbols-outlined text-[20px]">yard</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[20px]">yard</span>
                   Field Dosage Requirements
                 </h4>
                 <p className="text-xs text-[#9CAFA0] font-medium">
@@ -203,7 +203,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
                 {guide.fullGuideDetails.commonDeficiencies.map((def, idx) => (
                   <div key={idx} className="p-4 bg-[#16241A] rounded-xl border-2 border-[#1E2E21] space-y-1.5 shadow-xs">
                     <div className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[#84CC16] text-[20px]">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">
                         error_outline
                       </span>
                       <span className="font-['Space_Grotesk',sans-serif] font-extrabold text-sm text-[#F1F5F2]">
@@ -242,7 +242,7 @@ export const CropGuideModal: React.FC<CropGuideModalProps> = ({
               }}
               className="px-5 py-2.5 rounded-lg bg-[#84CC16] text-[#0B110D] text-xs font-['Space_Grotesk',sans-serif] font-black uppercase tracking-wider hover:bg-[#99E321] transition-colors flex-1 sm:flex-none flex items-center justify-center gap-1.5 border-2 border-[#84CC16]"
             >
-              <span className="material-symbols-outlined text-[16px] font-bold">shopping_cart</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">shopping_cart</span>
               Order Fertilizer for {guide.name}
             </button>
           </div>

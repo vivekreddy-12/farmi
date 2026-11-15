@@ -165,8 +165,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       status: selectedPaymentMethod === 'cod' ? 'Processing' : 'In Transit',
       statusBadge: selectedPaymentMethod === 'cod' ? 'Processing' : 'In Transit',
-      statusColor: 'text-[#795548]',
-      statusClass: 'bg-[#fdcdbc] text-[#795548]',
+      statusColor: 'text-[#5D4037]',
+      statusClass: 'bg-[#fdcdbc] text-[#5D4037]',
       badgeClass: 'bg-secondary-container text-on-secondary-container',
       itemsCount: cartItems.reduce((sum, item) => sum + item.quantity, 0),
       total: total,
@@ -280,10 +280,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 className="p-1 rounded-lg hover:bg-[#111A13] text-[#84CC16] transition-colors"
                 title="Back to Cart"
               >
-                <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[20px]">arrow_back</span>
               </button>
             ) : (
-              <span className="material-symbols-outlined text-[#84CC16] text-[24px]">
+              <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[24px]">
                 shopping_bag
               </span>
             )}
@@ -308,7 +308,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
@@ -316,7 +316,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         {smsNotificationToast && (
           <div className="mx-4 mt-3 p-3 bg-[#16241A] border-2 border-[#84CC16] rounded-xl flex items-center justify-between gap-2 shadow-lg animate-fade-in-up">
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#84CC16] text-[20px] animate-pulse">
+              <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px] animate-pulse">
                 sms
               </span>
               <span className="text-xs font-bold text-[#F1F5F2]">
@@ -327,7 +327,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               onClick={() => setSmsNotificationToast(null)}
               className="text-[#9CAFA0] hover:text-[#F1F5F2]"
             >
-              <span className="material-symbols-outlined text-[16px]">close</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">close</span>
             </button>
           </div>
         )}
@@ -338,7 +338,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             /* Confirmed Order State */
             <div className="text-center py-2 space-y-4">
               <div className="w-14 h-14 bg-[#84CC16] text-[#0B110D] rounded-full flex items-center justify-center mx-auto shadow-sm animate-bounce">
-                <span className="material-symbols-outlined text-3xl font-bold">check</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-3xl font-bold">check</span>
               </div>
               <div>
                 <h3 className="font-['Space_Grotesk',sans-serif] text-xl font-extrabold text-[#F1F5F2]">
@@ -353,7 +353,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="bg-[#16241A] p-4 rounded-xl text-left border-2 border-[#84CC16] space-y-3 shadow-md">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1E2E21]">
                   <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[#84CC16] text-[20px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">
                       mark_email_read
                     </span>
                     <span className="text-xs font-['Space_Grotesk',sans-serif] font-black uppercase text-[#84CC16]">
@@ -391,7 +391,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     href={newOrder.emailReceipt?.mailtoUrl || generateMailtoUrl(newOrder, newOrder.recipientEmail || DEFAULT_RECEIPT_EMAIL)}
                     className="p-2 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm"
                   >
-                    <span className="material-symbols-outlined text-[16px] font-bold">mail</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">mail</span>
                     <span>Open in Email App</span>
                   </a>
 
@@ -400,7 +400,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     disabled={isResendingEmail}
                     className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#84CC16] text-[#84CC16] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
                   >
-                    <span className="material-symbols-outlined text-[16px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                       {isResendingEmail ? 'sync' : 'forward_to_inbox'}
                     </span>
                     <span>{isResendingEmail ? 'Resending...' : 'Resend Email'}</span>
@@ -410,7 +410,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     onClick={handleCopyEmailReceipt}
                     className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[16px] text-[#84CC16]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">
                       {copiedEmailReceipt ? 'done' : 'content_copy'}
                     </span>
                     <span>{copiedEmailReceipt ? 'Copied!' : 'Copy Email Text'}</span>
@@ -420,7 +420,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     onClick={() => downloadReceiptHtml(newOrder)}
                     className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[16px] text-[#84CC16]">receipt_long</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">receipt_long</span>
                     <span>Download E-Invoice</span>
                   </button>
                 </div>
@@ -432,10 +432,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     className="w-full text-[11px] font-['Space_Grotesk',sans-serif] font-bold text-[#84CC16] flex items-center justify-between hover:underline"
                   >
                     <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]">visibility</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">visibility</span>
                       {showEmailPreview ? 'Hide Email Receipt Preview' : 'Inspect Formatted Email (njersey382@gmail.com)'}
                     </span>
-                    <span className="material-symbols-outlined text-[16px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                       {showEmailPreview ? 'expand_less' : 'expand_more'}
                     </span>
                   </button>
@@ -452,7 +452,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="bg-[#16241A] p-4 rounded-xl text-left border-2 border-[#84CC16] space-y-3 shadow-md">
                 <div className="flex items-center justify-between pb-2 border-b border-[#1E2E21]">
                   <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-[#84CC16] text-[20px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">
                       mark_chat_read
                     </span>
                     <span className="text-xs font-['Space_Grotesk',sans-serif] font-black uppercase text-[#84CC16]">
@@ -492,7 +492,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     rel="noopener noreferrer"
                     className="p-2 bg-[#25D366] hover:bg-[#20bd5a] text-[#0B110D] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm"
                   >
-                    <span className="material-symbols-outlined text-[16px] font-bold">chat</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">chat</span>
                     <span>Open WhatsApp</span>
                   </a>
 
@@ -501,7 +501,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     disabled={isResendingSms}
                     className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#84CC16] text-[#84CC16] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
                   >
-                    <span className="material-symbols-outlined text-[16px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                       {isResendingSms ? 'sync' : 'send_to_mobile'}
                     </span>
                     <span>{isResendingSms ? 'Resending...' : 'Resend SMS'}</span>
@@ -511,7 +511,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     onClick={handleCopyReceipt}
                     className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[16px] text-[#84CC16]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">
                       {copiedReceipt ? 'done' : 'content_copy'}
                     </span>
                     <span>{copiedReceipt ? 'Copied!' : 'Copy Receipt'}</span>
@@ -521,7 +521,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     onClick={() => downloadReceiptText(newOrder)}
                     className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[16px] text-[#84CC16]">download</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">download</span>
                     <span>Download TXT</span>
                   </button>
                 </div>
@@ -533,10 +533,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     className="w-full text-[11px] font-['Space_Grotesk',sans-serif] font-bold text-[#84CC16] flex items-center justify-between hover:underline"
                   >
                     <span className="flex items-center gap-1">
-                      <span className="material-symbols-outlined text-[14px]">smartphone</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[14px]">smartphone</span>
                       {showSmsPreview ? 'Hide Phone SMS Preview' : 'Inspect Exact SMS Message (9391216686)'}
                     </span>
-                    <span className="material-symbols-outlined text-[16px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                       {showSmsPreview ? 'expand_less' : 'expand_more'}
                     </span>
                   </button>
@@ -562,7 +562,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-[#111A13] border border-[#1E2E21] flex items-center justify-center text-[#84CC16] shrink-0">
-                    <span className="material-symbols-outlined text-[22px]">
+                    <span aria-hidden="true" className="material-symbols-outlined text-[22px]">
                       {newOrder.paymentDetails?.icon || 'payments'}
                     </span>
                   </div>
@@ -628,7 +628,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       }}
                       className="w-full py-2.5 bg-[#111A13] hover:bg-[#1E2E21] border border-[#84CC16]/60 text-[#84CC16] font-['Space_Grotesk',sans-serif] text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors"
                     >
-                      <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[16px]">open_in_new</span>
                       <span>Open {newOrder.paymentDetails?.title || 'Payment App'} Again</span>
                     </button>
                   </div>
@@ -649,7 +649,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
           ) : cartItems.length === 0 ? (
             /* Empty Cart */
             <div className="text-center py-16 space-y-3">
-              <span className="material-symbols-outlined text-6xl text-[#84CC16]">
+              <span aria-hidden="true" className="material-symbols-outlined text-6xl text-[#84CC16]">
                 remove_shopping_cart
               </span>
               <h3 className="font-['Space_Grotesk',sans-serif] font-extrabold text-base text-[#F1F5F2]">
@@ -665,7 +665,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="divide-y divide-[#1E2E21] space-y-3">
                 {cartItems.map((item) => (
                   <div key={item.product.id} className="pt-3 flex gap-3 items-center">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={item.product.image}
                       alt={item.product.name}
                       className="w-16 h-16 object-cover rounded-lg bg-[#16241A] shrink-0 border-2 border-[#1E2E21]"
@@ -716,7 +716,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-[10px] font-['Space_Grotesk',sans-serif] font-black text-[#84CC16] uppercase tracking-wider flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[15px]">pin_drop</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[15px]">pin_drop</span>
                       Delivery Destination
                     </label>
 
@@ -753,7 +753,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                       placeholder="e.g. North Field Gate 2, Plot #409, Kansas City MO"
                       className="w-full text-xs bg-[#111A13] border-2 border-[#1E2E21] rounded-lg p-2.5 text-[#F1F5F2] font-semibold outline-none focus:border-[#84CC16] pr-8"
                     />
-                    <span className="material-symbols-outlined absolute right-2.5 top-2.5 text-[#9CAFA0] text-[18px] pointer-events-none">
+                    <span aria-hidden="true" className="material-symbols-outlined absolute right-2.5 top-2.5 text-[#9CAFA0] text-[18px] pointer-events-none">
                       edit_location
                     </span>
                   </div>
@@ -762,7 +762,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   {detectedLocationInfo && (
                     <div className="p-2 bg-[#111A13] rounded-lg border border-[#84CC16]/50 flex items-center justify-between text-[11px] animate-fade-in">
                       <div className="flex items-center gap-1.5 text-[#84CC16] font-medium">
-                        <span className="material-symbols-outlined text-[15px] fill-icon">gps_fixed</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[15px] fill-icon">gps_fixed</span>
                         <span>
                           GPS Precision: <strong>±{detectedLocationInfo.accuracyMeters}m</strong> • ({detectedLocationInfo.latitude.toFixed(4)}°, {detectedLocationInfo.longitude.toFixed(4)}°)
                         </span>
@@ -780,7 +780,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   {/* Location Detection Toast Notification */}
                   {locationSuccessToast && (
                     <div className="text-[11px] text-[#84CC16] font-bold bg-[#84CC16]/10 border border-[#84CC16]/40 p-2 rounded flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-[15px]">check_circle</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[15px]">check_circle</span>
                       <span>{locationSuccessToast}</span>
                     </div>
                   )}
@@ -790,7 +790,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                     <div className="p-2.5 bg-[#ef4444]/10 border border-[#ef4444]/40 rounded-lg text-xs space-y-1">
                       <div className="flex items-center justify-between text-[#ef4444] font-bold">
                         <div className="flex items-center gap-1">
-                          <span className="material-symbols-outlined text-[16px]">location_off</span>
+                          <span aria-hidden="true" className="material-symbols-outlined text-[16px]">location_off</span>
                           <span>Location Permission Notice</span>
                         </div>
                         <button
@@ -807,7 +807,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         onClick={handleAutoDetectLocation}
                         className="text-[10px] font-bold uppercase text-[#84CC16] hover:underline flex items-center gap-1 pt-1"
                       >
-                        <span className="material-symbols-outlined text-[12px]">refresh</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[12px]">refresh</span>
                         Retry Auto-Detect
                       </button>
                     </div>
@@ -868,7 +868,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 )}
                 {appliedCoupon && (
                   <p className="text-[11px] text-[#84CC16] font-bold flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">check_circle</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px]">check_circle</span>
                     Voucher {appliedCoupon.code} applied! Saved ₹{discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                   </p>
                 )}
@@ -945,7 +945,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
               {/* Security Banner */}
               <div className="p-3 bg-[#16241A] rounded-xl border border-[#1E2E21] flex items-center justify-between text-[11px] text-[#9CAFA0]">
                 <div className="flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[#84CC16] text-[16px]">verified_user</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[16px]">verified_user</span>
                   <span>100% Buyer Protection & Agro Assurance</span>
                 </div>
                 <span className="text-[#84CC16] font-bold">farmin Secure</span>
@@ -963,7 +963,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 className="w-full py-3.5 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-colors active:scale-95 shadow-sm flex items-center justify-center gap-2 border-2 border-[#84CC16]"
               >
                 <span>Proceed to Payment Methods</span>
-                <span className="material-symbols-outlined text-[18px] font-bold">arrow_forward</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">arrow_forward</span>
                 <span className="font-mono font-bold">• ₹{total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
               </button>
             ) : (
@@ -978,7 +978,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   onClick={handleConfirmOrder}
                   className="flex-grow py-3.5 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-colors active:scale-95 shadow-sm flex items-center justify-center gap-2 border-2 border-[#84CC16]"
                 >
-                  <span className="material-symbols-outlined text-[18px] font-bold">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">
                     {selectedPaymentMethod === 'cod'
                       ? 'local_shipping'
                       : selectedPaymentMethod === 'upi'

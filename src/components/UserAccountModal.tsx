@@ -1,3 +1,4 @@
+import { validateEmail, validatePhone, validateName } from '../utils/validation';
 import React, { useState } from 'react';
 import { UserProfile, Order } from '../types';
 import { sounds } from '../utils/soundEffects';
@@ -28,14 +29,23 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email || DEFAULT_RECEIPT_EMAIL);
   const [phone, setPhone] = useState(user.phone || FORMATTED_DEFAULT_PHONE);
-  const [farmName, setFarmName] = useState(user.farmName || 'Miller Organic Field Station');
-  const [location, setLocation] = useState(user.location || 'Kansas City, MO (Zone 6A)');
+  const [farmName, setFarmName] = useState(user.farmName || 'My Farmstead');
+  const [location, setLocation] = useState(user.location || 'Select Location');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
+  const [profileError, setProfileError] = useState<string | null>(null);
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
+    const profileErr =
+      validateName(name) || validateEmail(email) || (phone.trim() ? validatePhone(phone) : '');
+    if (profileErr) {
+      setProfileError(profileErr);
+      return;
+    }
+    setProfileError(null);
     sounds.playSuccess();
     const updated: UserProfile = {
       ...user,
@@ -60,7 +70,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
             <div className="relative">
               <div className="w-14 h-14 rounded-xl overflow-hidden border-2 border-[#84CC16] bg-[#0B110D] shrink-0">
                 {user.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                  <img loading="lazy" decoding="async" src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-xl font-black bg-[#84CC16] text-[#0B110D]">
                     {user.name.charAt(0)}
@@ -68,7 +78,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 )}
               </div>
               <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#84CC16] border-2 border-[#111A13] flex items-center justify-center">
-                <span className="material-symbols-outlined text-[10px] text-[#0B110D] font-black">check</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[10px] text-[#0B110D] font-black">check</span>
               </span>
             </div>
 
@@ -103,7 +113,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
             }}
             className="w-8 h-8 rounded-lg bg-[#0B110D] text-[#9CAFA0] hover:text-[#F1F5F2] hover:bg-[#1E2E21] flex items-center justify-center transition-colors border border-[#1E2E21]"
           >
-            <span className="material-symbols-outlined text-[18px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
@@ -121,7 +131,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">person</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">person</span>
             <span>Grower Profile</span>
           </button>
 
@@ -137,7 +147,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">receipt_long</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">receipt_long</span>
             <span>My Invoices ({orders.length})</span>
           </button>
 
@@ -153,7 +163,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">mark_email_read</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">mark_email_read</span>
             <span>Auto E-Receipts</span>
           </button>
 
@@ -169,16 +179,22 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 : 'border-transparent text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">security</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">security</span>
             <span>Account Security</span>
           </button>
         </div>
 
         {/* Modal Body */}
         <div className="p-5 overflow-y-auto space-y-4">
+          {profileError && (
+            <div role="alert" className="p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-300 text-xs flex items-center gap-2">
+              <span aria-hidden="true" className="material-symbols-outlined text-red-400 text-[18px]">error</span>
+              <span>{profileError}</span>
+            </div>
+          )}
           {toastMessage && (
             <div className="p-3 bg-[#16241A] border-2 border-[#84CC16] rounded-xl text-[#84CC16] text-xs font-bold flex items-center gap-2">
-              <span className="material-symbols-outlined text-[18px]">verified</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">verified</span>
               <span>{toastMessage}</span>
             </div>
           )}
@@ -200,7 +216,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                         }}
                         className="text-xs text-[#84CC16] hover:underline font-bold flex items-center gap-1"
                       >
-                        <span className="material-symbols-outlined text-[14px]">edit</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[14px]">edit</span>
                         Edit Details
                       </button>
                     </div>
@@ -236,14 +252,14 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                   {/* Badges / Certification */}
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-3 bg-[#0B110D] border border-[#1E2E21] rounded-xl flex items-center gap-2.5">
-                      <span className="material-symbols-outlined text-[#84CC16] text-[22px]">eco</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[22px]">eco</span>
                       <div>
                         <div className="font-bold text-[#F1F5F2]">Organic Certified</div>
                         <div className="text-[10px] text-[#9CAFA0]">USDA & NPOP Eligible</div>
                       </div>
                     </div>
                     <div className="p-3 bg-[#0B110D] border border-[#1E2E21] rounded-xl flex items-center gap-2.5">
-                      <span className="material-symbols-outlined text-[#84CC16] text-[22px]">price_check</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[22px]">price_check</span>
                       <div>
                         <div className="font-bold text-[#F1F5F2]">Freight Subsidy</div>
                         <div className="text-[10px] text-[#9CAFA0]">100% Free Bulk Shipping</div>
@@ -252,7 +268,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleSaveProfile} className="space-y-3">
+                <form onSubmit={handleSaveProfile} className="space-y-3" noValidate>
                   <div>
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-[#9CAFA0] mb-1">
                       Grower Name
@@ -358,7 +374,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-[#0B110D] border border-[#1E2E21] flex items-center justify-center text-[#84CC16]">
-                        <span className="material-symbols-outlined text-[20px]">{order.icon || 'inventory_2'}</span>
+                        <span aria-hidden="true" className="material-symbols-outlined text-[20px]">{order.icon || 'inventory_2'}</span>
                       </div>
                       <div>
                         <div className="text-xs font-bold text-[#F1F5F2] flex items-center gap-1.5">
@@ -378,7 +394,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                         ₹{order.total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                       </div>
                       <span className="text-[10px] text-[#9CAFA0] group-hover:text-[#84CC16] flex items-center gap-0.5 justify-end">
-                        View Invoice <span className="material-symbols-outlined text-[12px]">chevron_right</span>
+                        View Invoice <span aria-hidden="true" className="material-symbols-outlined text-[12px]">chevron_right</span>
                       </span>
                     </div>
                   </div>
@@ -392,7 +408,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
             <div className="space-y-3 text-xs">
               <div className="p-4 bg-[#16241A] rounded-xl border-2 border-[#84CC16] space-y-2.5">
                 <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[#84CC16] text-[20px]">mark_email_read</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">mark_email_read</span>
                   <span className="font-['Space_Grotesk',sans-serif] font-black uppercase text-[#84CC16]">
                     Configured Digital Receipt Dispatch
                   </span>
@@ -465,7 +481,7 @@ export const UserAccountModal: React.FC<UserAccountModalProps> = ({
                 }}
                 className="w-full py-3 bg-red-950/60 hover:bg-red-900/80 border border-red-500/60 text-red-300 font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-xl transition-colors flex items-center justify-center gap-2 mt-4"
               >
-                <span className="material-symbols-outlined text-[18px]">logout</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">logout</span>
                 <span>Sign Out of farmin</span>
               </button>
             </div>

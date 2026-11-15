@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { validateEmail, validateName, looksLikeBot } from '../utils/validation';
 import { FAQItem, ConsultationBooking } from '../types';
 import { SUPPORT_CENTER_IMG } from '../data/mockData';
 
@@ -24,11 +25,22 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
   const [preferredDate, setPreferredDate] = useState('');
   const [acreage, setAcreage] = useState('');
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; email?: string; date?: string }>({});
+  const [honeypot, setHoneypot] = useState('');
+  const openedAt = useRef(Date.now());
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const handleSubmitConsultation = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !email || !preferredDate) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const found = {
+      name: validateName(fullName),
+      email: validateEmail(email),
+      date: !preferredDate ? 'Choose a date.' : preferredDate < today ? 'Choose today or a later date.' : '',
+    };
+    setErrors({ name: found.name || undefined, email: found.email || undefined, date: found.date || undefined });
+    if (found.name || found.email || found.date) return;
+    if (looksLikeBot(honeypot, openedAt.current)) return;
 
     onBookConsultation({
       fullName,
@@ -58,7 +70,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
       <section className="bg-[#111A13]/90 backdrop-blur-sm rounded-xl p-6 md:p-8 flex flex-col md:flex-row gap-6 items-center border-2 border-[#1E2E21] shadow-sm relative overflow-hidden">
         <div 
           className="absolute inset-0 pointer-events-none opacity-10 bg-cover bg-center mix-blend-screen"
-          style={{ backgroundImage: `url('/src/assets/images/dark_farm_field_1788272012797.jpg')` }}
+          style={{ backgroundImage: `url('/images/dark_farm_field_1788272012797.jpg')` }}
         />
 
         <div className="relative z-10 flex-1 flex flex-col gap-4">
@@ -76,7 +88,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               className="flex items-center justify-center gap-2 bg-[#84CC16] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold h-12 rounded-lg px-6 hover:bg-[#99E321] border-2 border-[#84CC16] transition-colors active:scale-95 shadow-sm"
               href="tel:9391216686"
             >
-              <span className="material-symbols-outlined text-[18px] fill font-bold">
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px] fill font-bold">
                 phone_in_talk
               </span>
               Direct Hotline: 9391216686
@@ -85,7 +97,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               onClick={onOpenLiveChat}
               className="flex items-center justify-center gap-2 border-2 border-[#1E2E21] bg-[#16241A] text-[#F1F5F2] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold h-12 rounded-lg px-6 hover:border-[#84CC16] hover:text-[#84CC16] transition-colors active:scale-95"
             >
-              <span className="material-symbols-outlined text-[18px]">chat</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">chat</span>
               Live Agronomist Chat
             </button>
           </div>
@@ -93,7 +105,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
 
         {/* Support Center Image with Active Badge */}
         <div className="relative z-10 flex-1 w-full md:w-auto h-64 rounded-xl overflow-hidden relative border-2 border-[#1E2E21] shadow-sm">
-          <img
+          <img loading="lazy" decoding="async"
             className="w-full h-full object-cover"
             alt="farmin Agricultural Support Center"
             src={SUPPORT_CENTER_IMG}
@@ -122,7 +134,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
 
           {formSubmitted ? (
             <div className="bg-[#16241A] border-2 border-[#84CC16] rounded-lg p-5 text-center my-4 space-y-2 animate-fade-in-up">
-              <span className="material-symbols-outlined text-4xl text-[#84CC16]">
+              <span aria-hidden="true" className="material-symbols-outlined text-4xl text-[#84CC16]">
                 check_circle
               </span>
               <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
@@ -133,7 +145,17 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               </p>
             </div>
           ) : (
-            <form onSubmit={handleSubmitConsultation} className="flex flex-col gap-3">
+            <form onSubmit={handleSubmitConsultation} className="flex flex-col gap-3" noValidate>
+              <input
+                type="text"
+                name="website"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute -left-[9999px] h-0 w-0 opacity-0"
+              />
               <div className="flex flex-col gap-1">
                 <label className="font-['Space_Grotesk',sans-serif] text-xs font-bold uppercase tracking-wider text-[#84CC16]" htmlFor="name">
                   Full Name
@@ -142,11 +164,16 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
                   className="bg-[#16241A] border-2 border-[#1E2E21] text-[#F1F5F2] font-['Plus_Jakarta_Sans',sans-serif] text-sm font-bold px-3 py-2 rounded-lg h-11 transition-colors outline-none focus:border-[#84CC16]"
                   id="name"
                   required
+                  aria-invalid={!!errors.name}
+                  aria-describedby={errors.name ? "name-error" : undefined}
                   placeholder="e.g. Alex Miller"
                   type="text"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                 />
+                {errors.name && (
+                  <p id="name-error" role="alert" className="text-xs text-red-300">{errors.name}</p>
+                )}
               </div>
 
               <div className="flex flex-col gap-1">
@@ -157,11 +184,16 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
                   className="bg-[#16241A] border-2 border-[#1E2E21] text-[#F1F5F2] font-['Plus_Jakarta_Sans',sans-serif] text-sm font-bold px-3 py-2 rounded-lg h-11 transition-colors outline-none focus:border-[#84CC16]"
                   id="email"
                   required
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                   placeholder="alex@farmcorp.com"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                {errors.email && (
+                  <p id="email-error" role="alert" className="text-xs text-red-300">{errors.email}</p>
+                )}
               </div>
 
               <div className="flex flex-col gap-1">
@@ -189,10 +221,16 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
                   className="bg-[#16241A] border-2 border-[#1E2E21] text-[#F1F5F2] font-['Plus_Jakarta_Sans',sans-serif] text-sm font-bold px-3 py-2 rounded-lg h-11 transition-colors outline-none cursor-pointer focus:border-[#84CC16]"
                   id="date"
                   required
+                  aria-invalid={!!errors.date}
+                  aria-describedby={errors.date ? "date-error" : undefined}
                   type="date"
+                  min={new Date().toISOString().slice(0, 10)}
                   value={preferredDate}
                   onChange={(e) => setPreferredDate(e.target.value)}
                 />
+                {errors.date && (
+                  <p id="date-error" role="alert" className="text-xs text-red-300">{errors.date}</p>
+                )}
               </div>
 
               <div className="flex flex-col gap-1">
@@ -224,7 +262,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
           {/* FAQs Container */}
           <div className="bg-[#111A13] rounded-xl p-6 border-2 border-[#1E2E21] shadow-sm">
             <h2 className="font-['Space_Grotesk',sans-serif] text-xl font-extrabold text-[#F1F5F2] mb-4 flex items-center gap-2">
-              <span className="material-symbols-outlined text-[#84CC16] fill text-[24px]">
+              <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] fill text-[24px]">
                 help
               </span>
               Frequently Asked Questions
@@ -245,7 +283,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
                       <span className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#F1F5F2]">
                         {faq.question}
                       </span>
-                      <span className="material-symbols-outlined text-[#84CC16] shrink-0 font-bold">
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] shrink-0 font-bold">
                         {isOpen ? 'remove' : 'add'}
                       </span>
                     </button>
@@ -269,7 +307,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               className="bg-[#111A13] rounded-xl p-5 border-2 border-[#1E2E21] shadow-sm flex flex-col gap-2 hover:border-[#84CC16]/60 transition-all cursor-pointer group"
             >
               <div className="w-10 h-10 bg-[#16241A] border border-[#1E2E21] rounded-lg flex items-center justify-center text-[#84CC16] group-hover:border-[#84CC16] transition-colors">
-                <span className="material-symbols-outlined text-[22px]">menu_book</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[22px]">menu_book</span>
               </div>
               <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2] group-hover:text-[#84CC16] transition-colors">
                 Application Guides
@@ -284,7 +322,7 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
               className="bg-[#111A13] rounded-xl p-5 border-2 border-[#1E2E21] shadow-sm flex flex-col gap-2 hover:border-[#84CC16]/60 transition-all cursor-pointer group"
             >
               <div className="w-10 h-10 bg-[#16241A] border border-[#1E2E21] rounded-lg flex items-center justify-center text-[#84CC16] group-hover:border-[#84CC16] transition-colors">
-                <span className="material-symbols-outlined text-[22px]">video_library</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[22px]">video_library</span>
               </div>
               <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2] group-hover:text-[#84CC16] transition-colors">
                 Video Tutorials
@@ -296,6 +334,11 @@ export const SupportScreen: React.FC<SupportScreenProps> = ({
           </div>
         </section>
       </div>
+    <p className="text-center text-xs text-[#9CAFA0]">
+        <a href="/terms" className="underline underline-offset-2 hover:text-[#84CC16]">Terms &amp; Conditions</a>
+        <span aria-hidden="true"> · </span>
+        <a href="/privacy" className="underline underline-offset-2 hover:text-[#84CC16]">Privacy Policy</a>
+      </p>
     </main>
   );
 };

@@ -1,5 +1,7 @@
 import { Order, SmsReceiptInfo, EmailReceiptInfo } from '../types';
 
+import { supabase } from '../lib/supabase';
+
 export const DEFAULT_RECEIPT_PHONE = '9391216686';
 export const FORMATTED_DEFAULT_PHONE = '+91 9391216686';
 export const DEFAULT_RECEIPT_EMAIL = 'njersey382@gmail.com';
@@ -294,9 +296,12 @@ export function dispatchOrderReceiptEmail(order: Order, email: string = DEFAULT_
 export async function sendOrderReceiptToCreator(order: Order): Promise<boolean> {
   try {
     const email = order.recipientEmail || DEFAULT_RECEIPT_EMAIL;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData?.session?.access_token;
+    if (!accessToken) return false; // receipts are emailed only for signed-in users
     const res = await fetch('/api/send-receipt', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({
         subject: generateReceiptEmailSubject(order),
         html: generateReceiptEmailHtml(order, email),

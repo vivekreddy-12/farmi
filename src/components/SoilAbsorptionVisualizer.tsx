@@ -200,7 +200,7 @@ export function SoilAbsorptionVisualizer() {
             activeSpray ? 'bg-[#84CC16] text-[#0B110D]' : 'bg-[#16241A] text-[#84CC16] hover:bg-[#84CC16] hover:text-[#0B110D]'
           }`}
         >
-          <span className="material-symbols-outlined text-[14px]">water_drop</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[14px]">water_drop</span>
           Trigger Foliar Spray
         </button>
       </div>

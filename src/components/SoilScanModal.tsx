@@ -86,7 +86,7 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
         <div className="p-5 bg-[#16241A] border-b-2 border-[#1E2E21] flex justify-between items-center shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#84CC16] text-[#0B110D] flex items-center justify-center font-bold">
-              <span className="material-symbols-outlined text-[24px]">document_scanner</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[24px]">document_scanner</span>
             </div>
             <div>
               <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
@@ -101,7 +101,7 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
@@ -109,9 +109,9 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
         <div className="p-5 overflow-y-auto space-y-5">
           {/* Scanner Viewfinder / Camera Simulation */}
           <div className="relative rounded-2xl bg-[#0B110D] border-2 border-[#1E2E21] h-60 overflow-hidden flex items-center justify-center">
-            <img
+            <img loading="lazy" decoding="async"
               src="https://images.unsplash.com/photo-1592417817098-8f3d6910985c?auto=format&fit=crop&w=1000&q=80"
-              alt="Soil Sample"
+              alt="Soil sample used for the optical scan"
               className="absolute inset-0 w-full h-full object-cover opacity-60 filter contrast-125"
             />
             
@@ -189,7 +189,7 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
             disabled={scanning}
             className="w-full py-3 bg-[#84CC16] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-xl hover:bg-[#99E321] transition-all flex items-center justify-center gap-2 border-2 border-[#84CC16] shadow-md disabled:opacity-50"
           >
-            <span className="material-symbols-outlined text-[20px] font-bold">
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px] font-bold">
               {scanning ? 'hourglass_top' : 'filter_center_focus'}
             </span>
             <span>{scanning ? 'Running Spectral NPK Scan...' : 'Scan New Soil Core Sample'}</span>
@@ -236,7 +236,7 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
 
                 <div className="p-3 bg-[#111A13] rounded-lg border border-[#1E2E21] space-y-1">
                   <span className="text-[10px] font-['Space_Grotesk',sans-serif] font-black uppercase text-[#ef4444] flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[14px]">warning</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[14px]">warning</span>
                     Detected Deficiency: {currentSample.deficiency}
                   </span>
                   <p className="text-xs text-[#9CAFA0] leading-relaxed">
@@ -249,7 +249,7 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
               {currentSample.recommendedProduct && (
                 <div className="bg-[#16241A] p-4 rounded-xl border-2 border-[#84CC16]/60 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-3.5">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={currentSample.recommendedProduct.image}
                       alt={currentSample.recommendedProduct.name}
                       className="w-14 h-14 object-cover rounded-lg bg-[#111A13] border-2 border-[#1E2E21] shrink-0"
@@ -281,7 +281,7 @@ export const SoilScanModal: React.FC<SoilScanModalProps> = ({
                       }}
                       className="px-4 py-2 bg-[#84CC16] text-[#0B110D] text-xs font-['Space_Grotesk',sans-serif] font-black uppercase tracking-wider rounded-lg hover:bg-[#99E321] transition-colors flex items-center gap-1 shrink-0"
                     >
-                      <span className="material-symbols-outlined text-[16px] font-bold">add_shopping_cart</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">add_shopping_cart</span>
                       Add to Cart
                     </button>
                   </div>
