@@ -51,7 +51,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
       <div className="bg-[#111A13] rounded-2xl w-full max-w-md shadow-2xl border-2 border-[#1E2E21] overflow-hidden text-[#F1F5F2]">
         <div className="p-5 bg-[#16241A] border-b-2 border-[#1E2E21] flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#84CC16] fill-icon text-[22px]">
+            <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] fill-icon text-[22px]">
               location_on
             </span>
             <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
@@ -59,7 +59,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
             </h3>
           </div>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors">
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 

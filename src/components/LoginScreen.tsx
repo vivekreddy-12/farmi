@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { validateEmail, validatePhone, validatePassword, validateName, validateOtp, looksLikeBot } from '../utils/validation';
+import React, { useRef, useState } from 'react';
 import { UserProfile } from '../types';
 import { sounds } from '../utils/soundEffects';
 import { isSupabaseConfigured } from '../lib/supabase';
@@ -26,19 +27,21 @@ const AVATAR =
 export const LoginScreen: React.FC<LoginScreenProps> = ({
   onLoginSuccess,
   onContinueAsGuest,
-  defaultEmail = 'njersey382@gmail.com',
+  defaultEmail = '',
 }) => {
   const [intent, setIntent] = useState<AuthIntent>('signin');
+  const [honeypot, setHoneypot] = useState('');
+  const openedAt = useRef(Date.now());
   const [mode, setMode] = useState<Mode>('email');
 
   // Sign in / Sign up fields
   const [email, setEmail] = useState(defaultEmail);
-  const [password, setPassword] = useState('farmin2026@Agri');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
   // Sign up extra fields
-  const [fullName, setFullName] = useState('Alex Miller');
-  const [farmName, setFarmName] = useState('Miller Organic Field Station');
+  const [fullName, setFullName] = useState('');
+  const [farmName, setFarmName] = useState('');
   const [cropType, setCropType] = useState('Corn & Wheat');
 
   // Phone fields
@@ -67,31 +70,22 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
     }
 
     // Demo fallback if Supabase keys not set yet
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      onLoginSuccess({
-        id: 'usr-google-demo',
-        name: 'Alex Miller',
-        email: 'njersey382@gmail.com',
-        phone: '+91 9391216686',
-        farmName: 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: AVATAR,
-        isLoggedIn: true,
-        memberSince: 'March 2024',
-        kisanId: 'FARMIN-KISAN-9831',
-        role: 'Verified Google Account Grower',
-      });
-    }, 700);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   // Handles Email Sign In or Sign Up
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      setErrorMessage('Please enter both your email and password.');
+    const formErr =
+      validateEmail(email) ||
+      (intent === 'signup' ? validateName(fullName) || validatePassword(password) : password ? '' : 'Enter your password.') ||
+      (intent === 'signup' && phone.trim() ? validatePhone(phone) : '');
+    if (formErr) {
+      setErrorMessage(formErr);
+      return;
+    }
+    if (intent === 'signup' && looksLikeBot(honeypot, openedAt.current)) {
+      setErrorMessage('Please wait a moment and try again.');
       return;
     }
     sounds.playClick();
@@ -164,32 +158,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       return;
     }
 
-    // Demo fallback when Supabase keys are pending
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      const nameFromEmail = email.split('@')[0];
-      const formattedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
-      onLoginSuccess({
-        id: `usr-demo-${Math.floor(100000 + Math.random() * 900000)}`,
-        name: intent === 'signup' ? fullName : email.toLowerCase() === 'njersey382@gmail.com' ? 'Alex Miller' : formattedName,
-        email: email.trim(),
-        phone: '+91 9391216686',
-        farmName: intent === 'signup' ? farmName : 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: AVATAR,
-        isLoggedIn: true,
-        memberSince: 'October 2026',
-        kisanId: 'FARMIN-KISAN-9831',
-        role: intent === 'signup' ? `Grower (${cropType})` : 'Commercial Grower',
-      });
-    }, 700);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   // Handles Sending OTP
   const handleSendOtp = async () => {
-    if (!phone.trim()) {
-      setErrorMessage('Please enter a valid 10-digit mobile number.');
+    const phoneErr = validatePhone(phone);
+    if (phoneErr) {
+      setErrorMessage(phoneErr);
       return;
     }
     sounds.playClick();
@@ -210,20 +187,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       return;
     }
 
-    // Demo fallback
-    setTimeout(() => {
-      setIsLoading(false);
-      setOtpSent(true);
-      setOtpCode('939121');
-      sounds.playDroplet();
-    }, 600);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   // Handles Phone OTP Verification
   const handlePhoneVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otpCode || otpCode.length < 4) {
-      setErrorMessage('Please enter the verification code sent to your phone.');
+    if (validateOtp(otpCode)) {
+      setErrorMessage('Enter the 6-digit code sent to your phone.');
       return;
     }
     sounds.playClick();
@@ -263,25 +235,8 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
       return;
     }
 
-    // Demo fallback
-    setTimeout(() => {
-      setIsLoading(false);
-      sounds.playSuccess();
-      const cleanPhone = phone.replace(/[^0-9]/g, '');
-      onLoginSuccess({
-        id: `usr-phone-${Math.floor(100000 + Math.random() * 900000)}`,
-        name: 'Alex Miller',
-        email: 'njersey382@gmail.com',
-        phone: `+91 ${cleanPhone.slice(-10)}`,
-        farmName: 'Miller Organic Field Station',
-        location: 'Kansas City, MO (Zone 6A)',
-        avatar: AVATAR,
-        isLoggedIn: true,
-        memberSince: 'October 2026',
-        kisanId: 'FARMIN-OTP-9391',
-        role: 'Verified Mobile Grower',
-      });
-    }, 700);
+    setIsLoading(false);
+    setErrorMessage('Sign-in is temporarily unavailable. Please try again later.');
   };
 
   const inputClass =
@@ -307,7 +262,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         ) : (
           <div className="px-3 py-2 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-300 flex flex-col gap-0.5">
             <span className="font-bold flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">info</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[14px]">info</span>
               Supabase Keys Pending in Vercel
             </span>
             <span className="text-[10px] text-amber-200/80">
@@ -319,7 +274,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center gap-2">
           <div className="w-14 h-14 rounded-2xl bg-[#0B110D] border-2 border-[#84CC16] flex items-center justify-center text-[#84CC16] shadow-lg shadow-[#84CC16]/10">
-            <span className="material-symbols-outlined text-[32px]">agriculture</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[32px]">agriculture</span>
           </div>
           <div>
             <h1 className="font-['Space_Grotesk',sans-serif] text-xl font-black uppercase tracking-wider text-[#F1F5F2]">
@@ -381,7 +336,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   : 'bg-[#0B110D] border-[#1E2E21] text-[#9CAFA0] hover:text-[#F1F5F2]'
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">mail</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">mail</span>
               <span>Email</span>
             </button>
             <button
@@ -397,29 +352,44 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   : 'bg-[#0B110D] border-[#1E2E21] text-[#9CAFA0] hover:text-[#F1F5F2]'
               }`}
             >
-              <span className="material-symbols-outlined text-[16px]">smartphone</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">smartphone</span>
               <span>Mobile OTP</span>
             </button>
           </div>
         )}
 
         {/* Alerts */}
-        {errorMessage && (
+        <p className="text-[11px] text-[#9CAFA0] text-center">
+            By continuing you agree to our{' '}
+            <a href="/terms" target="_blank" rel="noopener" className="text-[#84CC16] underline">Terms</a> and{' '}
+            <a href="/privacy" target="_blank" rel="noopener" className="text-[#84CC16] underline">Privacy Policy</a>.
+          </p>
+          {errorMessage && (
           <div className="p-3 bg-red-950/60 border border-red-500/50 rounded-xl text-red-300 text-xs flex items-center gap-2 animate-shake">
-            <span className="material-symbols-outlined text-red-400 text-[18px]">error</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-red-400 text-[18px]">error</span>
             <span>{errorMessage}</span>
           </div>
         )}
         {successMessage && (
           <div className="p-3 bg-[#84CC16]/10 border border-[#84CC16]/40 rounded-xl text-[#84CC16] text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">check_circle</span>
             <span>{successMessage}</span>
           </div>
         )}
 
         {/* EMAIL FORM (Sign In & Sign Up) */}
         {(mode === 'email' || intent === 'signup') && (
-          <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3.5">
+          <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3.5" noValidate>
+            <input
+              type="text"
+              name="website"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
             {intent === 'signup' && (
               <>
                 <div>
@@ -427,7 +397,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     Farmer Full Name
                   </label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                    <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                       person
                     </span>
                     <input
@@ -475,7 +445,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 Email Address
               </label>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                   mail
                 </span>
                 <input
@@ -494,22 +464,9 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 <label className="block text-[11px] font-bold uppercase tracking-wider text-[#9CAFA0]">
                   Password
                 </label>
-                {intent === 'signin' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sounds.playClick();
-                      setEmail('njersey382@gmail.com');
-                      setPassword('farmin2026@Agri');
-                    }}
-                    className="text-[10px] text-[#84CC16] hover:underline font-bold"
-                  >
-                    Use Demo Password
-                  </button>
-                )}
               </div>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                   lock
                 </span>
                 <input
@@ -526,7 +483,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] hover:text-[#F1F5F2]"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  <span className="material-symbols-outlined text-[16px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                     {showPassword ? 'visibility_off' : 'visibility'}
                   </span>
                 </button>
@@ -540,12 +497,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
             >
               {isLoading ? (
                 <>
-                  <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                   <span>{intent === 'signup' ? 'Creating Account...' : 'Authenticating...'}</span>
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-[18px] font-bold">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">
                     {intent === 'signup' ? 'person_add' : 'login'}
                   </span>
                   <span>{intent === 'signup' ? 'Register Farmer Account' : 'Sign In with Email'}</span>
@@ -564,7 +521,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               </label>
               <div className="flex gap-2">
                 <div className="relative flex-grow">
-                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                  <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                     smartphone
                   </span>
                   <input
@@ -596,7 +553,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                     Verification Code
                   </label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
+                    <span aria-hidden="true" className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#9CAFA0] text-[18px]">
                       password
                     </span>
                     <input
@@ -617,12 +574,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
                 >
                   {isLoading ? (
                     <>
-                      <span className="material-symbols-outlined text-[18px] animate-spin">sync</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px] animate-spin">sync</span>
                       <span>Verifying...</span>
                     </>
                   ) : (
                     <>
-                      <span className="material-symbols-outlined text-[18px] font-bold">verified</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">verified</span>
                       <span>Verify &amp; Sign In</span>
                     </>
                   )}
@@ -676,7 +633,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
           }}
           className="w-full py-2 text-[#9CAFA0] hover:text-[#F1F5F2] text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
         >
-          <span className="material-symbols-outlined text-[18px]">person_outline</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[18px]">person_outline</span>
           Continue as Guest Farmer
         </button>
       </div>

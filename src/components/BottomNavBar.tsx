@@ -115,7 +115,7 @@ export const BottomNavBar: React.FC<BottomNavBarProps> = ({
           }}
           className="flex flex-col items-center justify-center transition-all duration-150 active:scale-95 py-1 px-3 rounded-lg text-[#9CAFA0] hover:text-[#F1F5F2]"
         >
-          <span className="material-symbols-outlined text-[22px] mb-0.5 text-[#84CC16]">
+          <span aria-hidden="true" className="material-symbols-outlined text-[22px] mb-0.5 text-[#84CC16]">
             {user?.isLoggedIn ? 'account_circle' : 'login'}
           </span>
           <span className="font-['Space_Grotesk',sans-serif] text-[10px] uppercase font-bold tracking-wider leading-none">

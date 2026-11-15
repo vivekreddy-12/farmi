@@ -1,3 +1,4 @@
+import { trackEvent } from '../utils/analytics';
 import React from 'react';
 import { Product, Order, FarmLocation, UserProfile } from '../types';
 import { TiltCard } from './TiltCard';
@@ -47,7 +48,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       {/* Location Bar with Change option */}
       <div className="flex items-center justify-between bg-[#111A13]/90 backdrop-blur-sm px-4 py-3 rounded-xl border-2 border-[#1E2E21] shadow-sm">
         <div className="flex items-center gap-2.5 text-[#F1F5F2]">
-          <span className="material-symbols-outlined text-[#84CC16] fill-icon text-[20px]">
+          <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] fill-icon text-[20px]">
             location_on
           </span>
           <span className="font-['Space_Grotesk',sans-serif] text-sm font-bold tracking-tight text-[#F1F5F2]">
@@ -67,7 +68,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               className="hidden sm:flex items-center gap-1.5 text-xs text-[#84CC16] bg-[#16241A] px-2.5 py-1 rounded-lg border border-[#1E2E21] hover:border-[#84CC16] font-mono"
             >
               <span className="w-2 h-2 rounded-full bg-[#84CC16]" />
-              <span>{user?.email || 'njersey382@gmail.com'}</span>
+              <span>{user?.email}</span>
             </button>
           ) : (
             <button
@@ -77,7 +78,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               }}
               className="text-[#84CC16] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold flex items-center gap-1 bg-[#16241A] px-3 py-1.5 rounded-lg border border-[#84CC16] hover:bg-[#84CC16] hover:text-[#0B110D] active:scale-95 transition-all"
             >
-              <span className="material-symbols-outlined text-[16px]">login</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">login</span>
               Sign In
             </button>
           )}
@@ -90,7 +91,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             className="text-[#F1F5F2] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold flex items-center gap-1 bg-[#16241A] px-3 py-1.5 rounded-lg border border-[#1E2E21] hover:border-[#84CC16] hover:text-[#84CC16] active:scale-95 transition-all"
           >
             Change
-            <span className="material-symbols-outlined text-sm font-bold">expand_more</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-sm font-bold">expand_more</span>
           </button>
         </div>
       </div>
@@ -100,14 +101,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <div className="bg-[#16241A] p-4 rounded-xl border-2 border-[#84CC16]/60 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#0B110D] border border-[#84CC16] flex items-center justify-center text-[#84CC16] shrink-0">
-              <span className="material-symbols-outlined text-[22px]">account_circle</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[22px]">account_circle</span>
             </div>
             <div>
               <div className="text-xs font-['Space_Grotesk',sans-serif] font-black uppercase text-[#F1F5F2]">
                 Sign in to your farmin Agro Account
               </div>
               <div className="text-[11px] text-[#9CAFA0] mt-0.5">
-                Automatically sync order invoices to <strong>njersey382@gmail.com</strong>, save GPS field zones, and claim grower subsidies.
+                Save your orders and field locations, and get your receipts by email.
               </div>
             </div>
           </div>
@@ -116,9 +117,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               sounds.playClick();
               onOpenLogin?.();
             }}
-            className="w-full sm:w-auto px-4 py-2 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-all active:scale-95 shadow-sm shrink-0 flex items-center justify-center gap-1.5"
+            className="w-full sm:w-auto px-4 py-2 bg-transparent text-[#84CC16] border-2 border-[#84CC16] hover:bg-[#84CC16] hover:text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-wider rounded-lg transition-all active:scale-95 shrink-0 flex items-center justify-center gap-1.5"
           >
-            <span className="material-symbols-outlined text-[16px]">login</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">login</span>
             <span>Sign In / Register</span>
           </button>
         </div>
@@ -135,7 +136,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Farm Photo Ambient Background Watermark */}
           <div 
             className="absolute inset-0 pointer-events-none opacity-15 bg-cover bg-right-top mix-blend-screen"
-            style={{ backgroundImage: `url('/src/assets/images/dark_farm_field_1788272012797.jpg')` }}
+            style={{ backgroundImage: `url('/images/dark_farm_field_1788272012797.jpg')` }}
           />
 
           <div className="relative z-10">
@@ -154,12 +155,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <button
               onClick={() => {
                 sounds.playClick();
+                trackEvent('cta_order_fertilizer');
                 onOrderFertilizer();
               }}
               data-cursor-label="ORDER"
               className="bg-[#84CC16] text-[#0B110D] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-widest font-extrabold px-5 py-3.5 rounded-lg flex items-center justify-center gap-2 min-h-[48px] flex-1 sm:flex-none hover:bg-[#99E321] border-2 border-[#84CC16] transition-colors active:scale-95 shadow-sm"
             >
-              <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
               Order Fertilizer
             </button>
 
@@ -172,7 +174,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 data-cursor-label="SCAN"
                 className="bg-[#16241A] text-[#84CC16] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-widest font-extrabold px-5 py-3.5 rounded-lg flex items-center justify-center gap-2 min-h-[48px] flex-1 sm:flex-none border-2 border-[#84CC16]/60 hover:bg-[#84CC16] hover:text-[#0B110D] transition-all active:scale-95 shadow-xs"
               >
-                <span className="material-symbols-outlined text-[18px]">camera</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">camera</span>
                 Soil Optical Scan
               </button>
             )}
@@ -185,7 +187,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               data-cursor-label="DIAGNOSE"
               className="bg-[#16241A] text-[#F1F5F2] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-widest font-extrabold px-5 py-3.5 rounded-lg flex items-center justify-center gap-2 min-h-[48px] flex-1 sm:flex-none border-2 border-[#1E2E21] hover:border-[#84CC16] hover:text-[#84CC16] transition-colors active:scale-95"
             >
-              <span className="material-symbols-outlined text-[18px]">agriculture</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">agriculture</span>
               Crop Care Assistant
             </button>
           </div>
@@ -201,7 +203,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <WeatherAtmosphereCanvas condition={currentLocation.condition} />
 
           <div className="absolute -top-4 -right-4 opacity-10 pointer-events-none">
-            <span className="material-symbols-outlined fill-icon text-[140px] text-[#84CC16]">
+            <span aria-hidden="true" className="material-symbols-outlined fill-icon text-[140px] text-[#84CC16]">
               sunny
             </span>
           </div>
@@ -211,7 +213,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <span className="font-['Space_Grotesk',sans-serif] text-xs font-black uppercase tracking-widest text-[#84CC16]">
                 Farm Weather
               </span>
-              <span className="material-symbols-outlined fill-icon text-2xl text-[#84CC16]">
+              <span aria-hidden="true" className="material-symbols-outlined fill-icon text-2xl text-[#84CC16]">
                 partly_cloudy_day
               </span>
             </div>
@@ -262,7 +264,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             className="text-[#84CC16] font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-wider font-extrabold flex items-center hover:underline group"
           >
             View Catalog{' '}
-            <span className="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">
+            <span aria-hidden="true" className="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">
               arrow_forward
             </span>
           </button>
@@ -282,7 +284,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               className="min-w-[280px] w-[280px] bg-[#111A13] rounded-xl border-2 border-[#1E2E21] snap-start flex flex-col hover:border-[#84CC16]/60 transition-all duration-200 cursor-pointer group"
             >
               <div className="h-40 bg-[#16241A] rounded-t-lg relative overflow-hidden group">
-                <img
+                <img loading="lazy" decoding="async"
                   alt={product.name}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   src={product.image}
@@ -328,7 +330,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                     className="bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] p-2.5 rounded-lg transition-all active:scale-90 border-2 border-[#84CC16]"
                     title="Add to cart"
                   >
-                    <span className="material-symbols-outlined text-[18px] block font-bold">add</span>
+                    <span aria-hidden="true" className="material-symbols-outlined text-[18px] block font-bold">add</span>
                   </button>
                 </div>
               </div>
@@ -361,7 +363,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                       : 'bg-[#16241A] text-[#84CC16]'
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[24px]">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[24px]">
                     {order.icon}
                   </span>
                 </div>
@@ -405,7 +407,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         className="fixed right-5 bottom-20 md:bottom-6 bg-[#84CC16] text-[#0B110D] p-4 rounded-xl hover:bg-[#99E321] transition-all hover:scale-105 active:scale-95 flex items-center gap-2.5 z-40 h-[54px] min-w-[54px] md:min-w-auto group border-2 border-[#84CC16] shadow-lg"
         title="Schedule Soil Specialist Session"
       >
-        <span className="material-symbols-outlined text-[22px] font-bold">calendar_month</span>
+        <span aria-hidden="true" className="material-symbols-outlined text-[22px] font-bold">calendar_month</span>
         <span className="font-['Space_Grotesk',sans-serif] text-xs uppercase tracking-widest font-black pr-2 hidden md:block whitespace-nowrap">
           Book Specialist
         </span>

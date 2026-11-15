@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Analytics } from '@vercel/analytics/react';
+import ConsentBanner from './components/ConsentBanner';
+import { trackEvent } from './utils/analytics';
+import { getConsent, setConsent, ConsentChoice } from './utils/consent';
 import { ScreenType, CropGuide, Product, Order, OrderItem, FarmLocation, ConsultationBooking, UserProfile } from './types';
 import {
   INITIAL_PRODUCTS,
@@ -41,6 +44,7 @@ import { LoginScreen } from './components/LoginScreen';
 export default function App() {
   // Navigation
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('home');
+  const [consent, setConsent_] = useState<ConsentChoice | null>(() => getConsent());
   const [searchQuery, setSearchQuery] = useState('');
 
   // User Authentication State
@@ -172,6 +176,7 @@ export default function App() {
 
   // Auth Handlers
   const handleLoginSuccess = async (user: UserProfile) => {
+    trackEvent('login_success');
     setCurrentUser(user);
     if (isSupabaseConfigured && user.id && user.id !== 'guest') {
       const orders = await fetchFarmerOrders(user.id);
@@ -240,6 +245,7 @@ export default function App() {
   };
 
   const handleCheckoutComplete = async (newOrder: Order) => {
+    trackEvent('order_placed', { total: newOrder.total, items: newOrder.itemsCount });
     setRecentOrders((prev) => [newOrder, ...prev]);
     setCartItems([]);
 
@@ -278,7 +284,7 @@ export default function App() {
       <LoginScreen
         onLoginSuccess={handleLoginSuccess}
         onContinueAsGuest={() => setGuestBypass(true)}
-        defaultEmail="njersey382@gmail.com"
+        defaultEmail=""
       />
     );
   }
@@ -289,13 +295,13 @@ export default function App() {
       <div 
         className="fixed inset-0 pointer-events-none z-0 opacity-20 bg-cover bg-center bg-no-repeat transition-opacity duration-700"
         style={{
-          backgroundImage: `url('/src/assets/images/dark_farm_field_1788272012797.jpg')`,
+          backgroundImage: `url('/images/dark_farm_field_1788272012797.jpg')`,
         }}
       />
       <div 
         className="fixed inset-0 pointer-events-none z-0 opacity-10 mix-blend-overlay bg-cover bg-bottom bg-no-repeat"
         style={{
-          backgroundImage: `url('/src/assets/images/organic_soil_farm_1788271809867.jpg')`,
+          backgroundImage: `url('/images/organic_soil_farm_1788271809867.jpg')`,
         }}
       />
 
@@ -489,8 +495,8 @@ export default function App() {
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
-        defaultEmail="njersey382@gmail.com"
-        defaultPhone="9391216686"
+        defaultEmail=""
+        defaultPhone=""
       />
 
       {/* User Account / Profile Modal */}
@@ -507,8 +513,16 @@ export default function App() {
         }}
       />
 
-      {/* Vercel Web Analytics */}
-      <Analytics />
+      {/* Vercel Web Analytics: loads only after the visitor accepts */}
+      {consent === 'accepted' && <Analytics />}
+      {consent === null && (
+        <ConsentBanner
+          onChoose={(choice) => {
+            setConsent(choice);
+            setConsent_(choice);
+          }}
+        />
+      )}
     </div>
   );
 }

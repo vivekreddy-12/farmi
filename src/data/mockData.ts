@@ -1,7 +1,7 @@
 import { CropGuide, Product, Order, FarmLocation, FAQItem, UserProfile } from '../types';
 
-export const FARMIN_LOGO = '/src/assets/images/farmin_logo_icon_1788274974140.jpg';
-export const USER_AVATAR = '/src/assets/images/farmin_logo_icon_1788274974140.jpg';
+export const FARMIN_LOGO = '/images/farmin_logo_icon_1788274974140.jpg';
+export const USER_AVATAR = '/images/farmin_logo_icon_1788274974140.jpg';
 export const SUPPORT_AVATAR = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDsMK2K7Icfnh8CVnjI2qcB2F7JXE7S1l14fium94PmXkUPw0Cf2NpVYBc6eXaWg3INQ38WjS91c-w8jXK2l7vXQ5ezftZ_gZF2HPe5q6paCWEuAEVLf3xu_fLoEK7xbkkr7mGutJJcZJyvMqTcRco-ZoS4fLZxEBsIS3gV-nyyFOPhRAPZpRIT_pqQFbtu59IHKMT5FS0uRImULDyTD9v1ok4QWMJfXk-O-5pdUWRUXsTpLz56kA6zrg';
 export const SUPPORT_CENTER_IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDAMWIbja1VZ0ULtuvvVKN-ge93zf2PnlqEdTiYv61iOlCjQPG24BKSbCSD-Ontdq2UxzqSFVwm2bzn6HvsQVIy1CZIQV0gy28BUKhmByd0vb6X3cqjbCFhu5pdr6y94iXLw4I-MLkVbym6JHYRkYExqN6qDuoY5CiFTHaL4JQbm--8A1KnwQCjqxuk-G0FtC8nWkkAhjguSEo7J-qVMb8srv_Mscd0wzji90x-ax1UnWSHHEJVKmhZYg';
 
@@ -77,7 +77,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     weightOrVolume: '50kg bag',
     description: 'High-yield nitrogen formula for early growth stages. 50kg bag.',
     fullDescription: 'Pro-Gro Nitrogen Plus delivers rapid, sustained nitrogen uptake designed for active tillering and vigorous vegetative development. Formulated with quick-release and controlled-release nitrogen fractions to minimize leaching while maximizing canopy density.',
-    image: '/src/assets/images/pro_gro_nitrogen_1788271684240.jpg',
+    image: '/images/pro_gro_nitrogen_1788271684240.jpg',
     badge: 'Best Seller',
     inStock: true,
     formulation: 'Granular',
@@ -94,7 +94,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     weightOrVolume: '5 Litre Can',
     description: 'Liquid organic soil conditioner for improved microbial health. 5L Can.',
     fullDescription: 'EcoBalance Conditioner contains high-grade humic and fulvic acids enriched with beneficial mycorrhizal fungi. It optimizes soil cation-exchange capacity (CEC), enhances moisture retention in sandy soils, and unlocks bound micronutrients.',
-    image: '/src/assets/images/ecobalance_conditioner_jug_1788271702479.jpg',
+    image: '/images/ecobalance_conditioner_jug_1788271702479.jpg',
     inStock: true,
     formulation: 'Liquid',
     coveragePerBag: 'Dilutes up to 200 Gallons spray solution',
@@ -109,7 +109,7 @@ export const INITIAL_PRODUCTS: Product[] = [
     weightOrVolume: '10kg tub',
     description: 'Balanced 10-10-10 slow release pellets. Ideal for seasonal sustained feeding. 10kg tub.',
     fullDescription: 'Polymer-coated balanced NPK formula engineered for steady 90-day nutrient release. Minimizes root burn risk and supports continuous root extension, stem thickening, and uniform flower set.',
-    image: '/src/assets/images/npk_pellets_tub_1788271726663.jpg',
+    image: '/images/npk_pellets_tub_1788271726663.jpg',
     inStock: true,
     formulation: 'Slow-Release Pellets',
     npkRatio: '10-10-10',
@@ -440,8 +440,8 @@ export const INITIAL_ORDERS: Order[] = [
     date: 'Oct 28, 2026',
     status: 'In Transit',
     statusBadge: 'In Transit',
-    statusColor: 'text-[#795548]',
-    statusClass: 'bg-[#fdcdbc] text-[#795548]',
+    statusColor: 'text-[#5D4037]',
+    statusClass: 'bg-[#fdcdbc] text-[#5D4037]',
     badgeClass: 'bg-secondary-container text-on-secondary-container',
     itemsCount: 3,
     total: 6497.00,

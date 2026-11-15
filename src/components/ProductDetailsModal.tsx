@@ -31,7 +31,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
       <div className="bg-[#111A13] rounded-2xl w-full max-w-lg shadow-2xl border-2 border-[#1E2E21] overflow-hidden flex flex-col max-h-[90vh] text-[#F1F5F2]">
         {/* Product Image Banner */}
         <div className="h-56 bg-[#16241A] relative shrink-0 border-b-2 border-[#1E2E21]">
-          <img
+          <img loading="lazy" decoding="async"
             src={product.image}
             alt={product.name}
             className="w-full h-full object-cover"
@@ -40,7 +40,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
             onClick={onClose}
             className="absolute top-4 right-4 bg-[#111A13]/80 hover:bg-[#111A13] text-[#F1F5F2] p-1.5 rounded-full backdrop-blur-xs transition-colors border border-[#1E2E21]"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
           {product.badge && (
             <span className="absolute top-4 left-4 bg-[#84CC16] text-[#0B110D] text-[10px] font-['Space_Grotesk',sans-serif] font-black uppercase tracking-widest px-3 py-1 rounded shadow-sm">
@@ -124,7 +124,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                 : 'bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D]'
             }`}
           >
-            <span className="material-symbols-outlined text-[18px] font-bold">
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px] font-bold">
               {added ? 'check' : 'add_shopping_cart'}
             </span>
             {added ? 'Added to Cart!' : `Add to Cart • ₹${(product.price * quantity).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}

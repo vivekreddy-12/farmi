@@ -41,14 +41,14 @@ export const ApplicationGuidesModal: React.FC<ApplicationGuidesModalProps> = ({ 
         <div className="p-5 bg-[#16241A] border-b-2 border-[#1E2E21] flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg bg-[#84CC16] text-[#0B110D] flex items-center justify-center font-bold">
-              <span className="material-symbols-outlined text-[20px]">menu_book</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">menu_book</span>
             </div>
             <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
               Agricultural Application Guides
             </h3>
           </div>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors">
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 

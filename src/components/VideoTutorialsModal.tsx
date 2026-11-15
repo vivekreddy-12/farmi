@@ -40,14 +40,14 @@ export const VideoTutorialsModal: React.FC<VideoTutorialsModalProps> = ({ isOpen
         <div className="p-5 bg-[#16241A] border-b-2 border-[#1E2E21] flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-lg bg-[#84CC16] text-[#0B110D] flex items-center justify-center font-bold">
-              <span className="material-symbols-outlined text-[20px]">video_library</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">video_library</span>
             </div>
             <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
               Agronomy Video Tutorials
             </h3>
           </div>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors">
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
@@ -55,7 +55,7 @@ export const VideoTutorialsModal: React.FC<VideoTutorialsModalProps> = ({ isOpen
           {playingId ? (
             <div className="bg-[#16241A] rounded-xl p-6 text-[#F1F5F2] text-center space-y-3 border-2 border-[#1E2E21]">
               <div className="w-16 h-16 bg-[#84CC16] text-[#0B110D] rounded-full flex items-center justify-center mx-auto animate-pulse">
-                <span className="material-symbols-outlined text-3xl font-bold">play_arrow</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-3xl font-bold">play_arrow</span>
               </div>
               <h4 className="font-['Space_Grotesk',sans-serif] font-extrabold text-base text-[#F1F5F2]">
                 Playing: {videos.find((v) => v.id === playingId)?.title}
@@ -78,14 +78,14 @@ export const VideoTutorialsModal: React.FC<VideoTutorialsModalProps> = ({ isOpen
                 className="flex flex-col sm:flex-row gap-3 bg-[#16241A] border-2 border-[#1E2E21] rounded-xl overflow-hidden hover:border-[#84CC16] transition-all cursor-pointer shadow-xs group"
               >
                 <div className="sm:w-48 h-28 relative bg-[#111A13] shrink-0">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={v.thumbnail}
                     alt={v.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                   />
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
                     <span className="w-10 h-10 rounded-full bg-[#84CC16] text-[#0B110D] flex items-center justify-center shadow-md border border-[#84CC16]">
-                      <span className="material-symbols-outlined text-[20px] font-bold">play_arrow</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[20px] font-bold">play_arrow</span>
                     </span>
                   </div>
                   <span className="absolute bottom-1.5 right-1.5 bg-[#0B110D] text-[#84CC16] text-[10px] font-mono font-bold px-1.5 py-0.5 rounded border border-[#1E2E21]">

@@ -55,7 +55,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
       <div className="bg-[#111A13] rounded-2xl w-full max-w-2xl shadow-2xl border-2 border-[#1E2E21] overflow-hidden flex flex-col max-h-[80vh] text-[#F1F5F2]">
         {/* Search Header */}
         <div className="p-4 border-b-2 border-[#1E2E21] bg-[#16241A] flex items-center gap-3">
-          <span className="material-symbols-outlined text-[#84CC16] text-[24px]">search</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[24px]">search</span>
           <input
             type="text"
             autoFocus
@@ -69,7 +69,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
               onClick={() => setQuery('')}
               className="p-1 rounded-full text-[#9CAFA0] hover:text-[#F1F5F2]"
             >
-              <span className="material-symbols-outlined text-[20px]">close</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
             </button>
           )}
           <button
@@ -84,7 +84,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
         <div className="p-5 overflow-y-auto space-y-5">
           {!query.trim() ? (
             <div className="py-8 text-center text-[#9CAFA0] text-xs space-y-2">
-              <span className="material-symbols-outlined text-4xl block text-[#84CC16]">
+              <span aria-hidden="true" className="material-symbols-outlined text-4xl block text-[#84CC16]">
                 travel_explore
               </span>
               <p className="font-['Plus_Jakarta_Sans',sans-serif] font-medium text-[#9CAFA0]">
@@ -127,7 +127,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         className="p-3 bg-[#16241A] hover:bg-[#111A13] flex items-center justify-between cursor-pointer transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={c.image}
                             alt={c.name}
                             className="w-10 h-10 rounded border border-[#1E2E21] object-cover"
@@ -161,7 +161,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                         className="p-3 bg-[#16241A] hover:bg-[#111A13] flex items-center justify-between cursor-pointer transition-colors"
                       >
                         <div className="flex items-center gap-3">
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={p.image}
                             alt={p.name}
                             className="w-10 h-10 rounded border border-[#1E2E21] object-cover"

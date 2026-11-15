@@ -35,7 +35,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             onClick={() => onNavigate('home')}
           >
             <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-[#84CC16]/60 shrink-0">
-              <img
+              <img decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 alt="farmin - Sustainable Farming & Agronomy"
                 src={USER_AVATAR}
@@ -133,7 +133,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
                 className="h-10 px-3.5 flex items-center gap-2 rounded-lg border-2 border-[#84CC16]/60 bg-[#16241A] hover:bg-[#84CC16] hover:text-[#0B110D] text-[#84CC16] transition-all active:scale-95 font-extrabold text-xs uppercase tracking-wider shadow-sm group"
                 title="Scan Soil Sample with Camera"
               >
-                <span className="material-symbols-outlined text-[18px] group-hover:rotate-12 transition-transform">
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px] group-hover:rotate-12 transition-transform">
                   camera
                 </span>
                 <span>Soil Scan</span>
@@ -146,7 +146,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               className="h-10 w-10 flex items-center justify-center rounded-lg border-2 border-[#1E2E21] bg-[#16241A] hover:border-[#84CC16] hover:text-[#84CC16] text-[#F1F5F2] transition-all active:scale-95 font-bold"
               title="Search crops, fertilizers, guides"
             >
-              <span className="material-symbols-outlined text-[20px]">search</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">search</span>
             </button>
 
             <button
@@ -155,7 +155,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               className="h-10 px-4 flex items-center gap-2 rounded-lg bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] border-2 border-[#84CC16] transition-all active:scale-95 relative font-extrabold text-xs uppercase tracking-wider shadow-sm"
               title="View Cart"
             >
-              <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[20px]">shopping_bag</span>
               <span>Cart</span>
               {cartItemsCount > 0 && (
                 <span className="bg-[#0B110D] text-[#84CC16] text-[11px] font-black w-5 h-5 rounded flex items-center justify-center -mr-1">
@@ -173,7 +173,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               >
                 <div className="w-6 h-6 rounded-full overflow-hidden border border-[#84CC16] bg-[#0B110D] shrink-0">
                   {user.avatar ? (
-                    <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                    <img decoding="async" src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-[10px] font-black bg-[#84CC16] text-[#0B110D]">
                       {user.name.charAt(0)}
@@ -195,7 +195,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
                 className="h-10 px-3.5 flex items-center gap-1.5 rounded-lg border-2 border-[#84CC16] bg-[#16241A] hover:bg-[#84CC16] hover:text-[#0B110D] text-[#84CC16] transition-all active:scale-95 font-extrabold text-xs uppercase tracking-wider shadow-sm"
                 title="Sign In / Register"
               >
-                <span className="material-symbols-outlined text-[18px]">account_circle</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">account_circle</span>
                 <span>Login</span>
               </button>
             )}
@@ -210,7 +210,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
           onClick={() => onNavigate('home')}
         >
           <div className="w-8 h-8 rounded-lg overflow-hidden border-2 border-[#84CC16]/60 shrink-0">
-            <img
+            <img decoding="async"
               className="w-full h-full object-cover"
               alt="farmin Brand Icon"
               src={USER_AVATAR}
@@ -230,7 +230,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               className="h-9 px-2.5 flex items-center gap-1.5 rounded-lg border-2 border-[#84CC16]/60 bg-[#16241A] text-[#84CC16] active:scale-95 transition-transform text-xs font-bold font-['Space_Grotesk',sans-serif]"
               title="Scan Soil Sample"
             >
-              <span className="material-symbols-outlined text-[18px]">camera</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[18px]">camera</span>
               <span>Scan</span>
             </button>
           )}
@@ -240,7 +240,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             aria-label="Search"
             className="h-9 w-9 flex items-center justify-center rounded-lg border-2 border-[#1E2E21] bg-[#16241A] text-[#F1F5F2] active:scale-95 transition-transform"
           >
-            <span className="material-symbols-outlined text-[20px]">search</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">search</span>
           </button>
           
           <button
@@ -248,7 +248,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
             aria-label="Shopping Cart"
             className="h-9 px-3 flex items-center gap-1.5 rounded-lg bg-[#84CC16] text-[#0B110D] border-2 border-[#84CC16] active:scale-95 transition-transform relative font-bold text-xs"
           >
-            <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">shopping_bag</span>
             {cartItemsCount > 0 && (
               <span className="bg-[#0B110D] text-[#84CC16] text-[10px] font-black w-4 h-4 rounded flex items-center justify-center -mr-1">
                 {cartItemsCount}
@@ -265,7 +265,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               title="My Account"
             >
               {user.avatar ? (
-                <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                <img decoding="async" src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-xs font-black bg-[#84CC16] text-[#0B110D]">
                   {user.name.charAt(0)}
@@ -278,7 +278,7 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({
               aria-label="Sign In"
               className="h-9 px-2.5 rounded-lg border-2 border-[#84CC16] bg-[#16241A] text-[#84CC16] text-xs font-bold font-['Space_Grotesk',sans-serif] flex items-center gap-1 active:scale-95 transition-transform shrink-0"
             >
-              <span className="material-symbols-outlined text-[16px]">login</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[16px]">login</span>
               <span>Login</span>
             </button>
           )}

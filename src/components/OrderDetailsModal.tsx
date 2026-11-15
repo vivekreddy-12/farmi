@@ -79,7 +79,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
         <div className="p-5 bg-[#16241A] border-b-2 border-[#1E2E21] flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-[#84CC16] text-[#0B110D] flex items-center justify-center font-bold">
-              <span className="material-symbols-outlined text-[24px]">local_shipping</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[24px]">local_shipping</span>
             </div>
             <div>
               <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
@@ -92,14 +92,14 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
         {/* Resend status toast */}
         {resendStatus && (
           <div className="mx-4 mt-3 p-2.5 bg-[#16241A] border-2 border-[#84CC16] rounded-xl flex items-center gap-2 text-xs font-bold text-[#84CC16] animate-fade-in-up">
-            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[18px]">check_circle</span>
             <span>{resendStatus}</span>
           </div>
         )}
@@ -110,7 +110,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
           <div className="bg-[#16241A] p-4 rounded-xl space-y-3 border-2 border-[#84CC16]">
             <div className="flex justify-between items-center pb-2 border-b border-[#1E2E21]">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#84CC16] text-[20px]">mark_email_read</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">mark_email_read</span>
                 <span className="text-[11px] font-['Space_Grotesk',sans-serif] font-black uppercase text-[#84CC16]">
                   E-Invoice Dispatched to {targetEmail}
                 </span>
@@ -146,7 +146,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 href={mailtoUrl}
                 className="p-2 bg-[#84CC16] hover:bg-[#99E321] text-[#0B110D] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm"
               >
-                <span className="material-symbols-outlined text-[16px] font-bold">mail</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">mail</span>
                 <span>Open in Email App</span>
               </a>
 
@@ -155,7 +155,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 disabled={isResendingEmail}
                 className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#84CC16] text-[#84CC16] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
               >
-                <span className="material-symbols-outlined text-[16px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                   {isResendingEmail ? 'sync' : 'forward_to_inbox'}
                 </span>
                 <span>{isResendingEmail ? 'Sending...' : 'Resend Email'}</span>
@@ -165,7 +165,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 onClick={handleCopyEmail}
                 className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px] text-[#84CC16]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">
                   {copiedEmail ? 'done' : 'content_copy'}
                 </span>
                 <span>{copiedEmail ? 'Copied!' : 'Copy Email'}</span>
@@ -175,7 +175,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 onClick={() => downloadReceiptHtml(order)}
                 className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px] text-[#84CC16]">receipt_long</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">receipt_long</span>
                 <span>Download HTML</span>
               </button>
             </div>
@@ -187,10 +187,10 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 className="w-full text-[11px] font-['Space_Grotesk',sans-serif] font-bold text-[#84CC16] flex items-center justify-between hover:underline"
               >
                 <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">visibility</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[14px]">visibility</span>
                   {showEmailPreview ? 'Hide Email Receipt Body' : 'View Full Email Sent to njersey382@gmail.com'}
                 </span>
-                <span className="material-symbols-outlined text-[16px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                   {showEmailPreview ? 'expand_less' : 'expand_more'}
                 </span>
               </button>
@@ -207,7 +207,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
           <div className="bg-[#16241A] p-4 rounded-xl space-y-3 border-2 border-[#1E2E21]">
             <div className="flex justify-between items-center pb-2 border-b border-[#1E2E21]">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#84CC16] text-[20px]">mark_chat_read</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[20px]">mark_chat_read</span>
                 <span className="text-[11px] font-['Space_Grotesk',sans-serif] font-black uppercase text-[#84CC16]">
                   SMS Receipt Dispatched to {targetPhone}
                 </span>
@@ -245,7 +245,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 rel="noopener noreferrer"
                 className="p-2 bg-[#25D366] hover:bg-[#20bd5a] text-[#0B110D] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-sm"
               >
-                <span className="material-symbols-outlined text-[16px] font-bold">chat</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] font-bold">chat</span>
                 <span>Open WhatsApp</span>
               </a>
 
@@ -254,7 +254,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 disabled={isResending}
                 className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#84CC16] text-[#84CC16] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all disabled:opacity-50"
               >
-                <span className="material-symbols-outlined text-[16px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                   {isResending ? 'sync' : 'send_to_mobile'}
                 </span>
                 <span>{isResending ? 'Sending...' : 'Resend SMS'}</span>
@@ -264,7 +264,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 onClick={handleCopy}
                 className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px] text-[#84CC16]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">
                   {copied ? 'done' : 'content_copy'}
                 </span>
                 <span>{copied ? 'Copied!' : 'Copy Receipt'}</span>
@@ -274,7 +274,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 onClick={() => downloadReceiptText(order)}
                 className="p-2 bg-[#111A13] hover:bg-[#1E2E21] border border-[#1E2E21] text-[#F1F5F2] rounded-lg font-['Space_Grotesk',sans-serif] text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors"
               >
-                <span className="material-symbols-outlined text-[16px] text-[#84CC16]">download</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px] text-[#84CC16]">download</span>
                 <span>Download Invoice</span>
               </button>
             </div>
@@ -286,10 +286,10 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
                 className="w-full text-[11px] font-['Space_Grotesk',sans-serif] font-bold text-[#84CC16] flex items-center justify-between hover:underline"
               >
                 <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[14px]">smartphone</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-[14px]">smartphone</span>
                   {showSmsPreview ? 'Hide SMS Message Body' : 'View Full SMS Sent to 9391216686'}
                 </span>
-                <span className="material-symbols-outlined text-[16px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[16px]">
                   {showSmsPreview ? 'expand_less' : 'expand_more'}
                 </span>
               </button>
@@ -334,7 +334,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
               {order.items.map((it, idx) => (
                 <div key={idx} className="p-3 flex items-center justify-between gap-3 bg-[#16241A]">
                   <div className="flex items-center gap-3">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={it.product.image}
                       alt={it.product.name}
                       className="w-12 h-12 rounded object-cover bg-[#111A13] border-2 border-[#1E2E21]"
@@ -367,7 +367,7 @@ export const OrderDetailsModal: React.FC<OrderDetailsModalProps> = ({ order, onC
 
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-[#111A13] border border-[#1E2E21] flex items-center justify-center text-[#84CC16] shrink-0">
-                <span className="material-symbols-outlined text-[18px]">
+                <span aria-hidden="true" className="material-symbols-outlined text-[18px]">
                   {order.paymentDetails?.icon || 'payments'}
                 </span>
               </div>

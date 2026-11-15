@@ -65,7 +65,7 @@ export const CropCareModal: React.FC<CropCareModalProps> = ({
         <div className="p-5 bg-[#16241A] border-b-2 border-[#1E2E21] flex justify-between items-center">
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-lg bg-[#84CC16] text-[#0B110D] flex items-center justify-center font-bold">
-              <span className="material-symbols-outlined text-[24px]">agriculture</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-[24px]">agriculture</span>
             </div>
             <div>
               <h3 className="font-['Space_Grotesk',sans-serif] text-base font-extrabold text-[#F1F5F2]">
@@ -75,7 +75,7 @@ export const CropCareModal: React.FC<CropCareModalProps> = ({
             </div>
           </div>
           <button onClick={onClose} className="p-1 rounded-full hover:bg-[#111A13] text-[#9CAFA0] hover:text-[#F1F5F2] transition-colors">
-            <span className="material-symbols-outlined text-[20px]">close</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[20px]">close</span>
           </button>
         </div>
 
@@ -92,7 +92,7 @@ export const CropCareModal: React.FC<CropCareModalProps> = ({
                 : 'text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">biotech</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">biotech</span>
             Field Symptom Diagnosis
           </button>
           <button
@@ -106,7 +106,7 @@ export const CropCareModal: React.FC<CropCareModalProps> = ({
                 : 'text-[#9CAFA0] hover:text-[#F1F5F2]'
             }`}
           >
-            <span className="material-symbols-outlined text-[16px]">science</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-[16px]">science</span>
             Soil Absorption Physics Lab
           </button>
         </div>
@@ -194,7 +194,7 @@ export const CropCareModal: React.FC<CropCareModalProps> = ({
                 {onOpenSoilScan && (
                   <div className="mt-3 p-3 bg-[#16241A] rounded-lg border border-[#84CC16]/40 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="material-symbols-outlined text-[#84CC16] text-[18px]">photo_camera</span>
+                      <span aria-hidden="true" className="material-symbols-outlined text-[#84CC16] text-[18px]">photo_camera</span>
                       <span className="text-[#F1F5F2] font-semibold">Test your soil directly with Camera</span>
                     </div>
                     <button
